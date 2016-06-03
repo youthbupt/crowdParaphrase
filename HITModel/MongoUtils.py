@@ -50,9 +50,9 @@ class MongoUtils():
 
 	@staticmethod
 	def cleanAllPhrase():
-		paraCand.delete()
-		nlpPhrase.delete()
-		dbPhrase.delete()
+		paraCand.objects().delete()
+		nlpPhrase.objects().delete()
+		dbPhrase.objects().delete()
 
 
 	@staticmethod

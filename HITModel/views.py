@@ -1,7 +1,7 @@
 #coding=utf8
 from django.shortcuts import render
 from MongoUtils import MongoUtils
-import django.http.HttpResponse
+from django.http import HttpResponse
 import re
 
 def InsertToDatabase(source, path):
@@ -45,8 +45,12 @@ def InsertFromFile(request):
 		InsertToDatabase(source, path)
 	return HTTPResponse("Success!")
 
-def cleanParaphraseDatabase(request):
+def cleanParaphraseDatabase(request = None):
 	MongoUtils.cleanAllPhrase()
+	print "remove all paraphrase!"
 	return HTTPResponse("Delete all paraphrase!")
+
+if __name__ == "__main__":
+	cleanParaphraseDatabase()
 
 # Create your views here.

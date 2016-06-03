@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>crowdsourcing paraphrase</title>
+   <link href="http://libs.baidu.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+   <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+   <script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+
+</head>
+<script>
+   
+   function login(){
+      //alert($("#username").val())
+      $.ajax( {
+         type: "GET",
+         url: "userLogin",
+         data: {
+            "user": $("#username").val(),
+            csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value
+         },
+         success: function (data) {
+            if (data == "success")
+               location.href = "labelPage/";
+            else {
+               alert(data)
+            }
+         },
+         error: function(data) {
+            alert("Login failed, please check your username!")
+         }
+      });
+
+   }
+   function checkLogin() {
+      
+      $.ajax( {
+         type: "POST",
+         url: "checkLogin/",
+         data: {
+            csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value
+         },
+         success: function (data) {
+            if (data == "success")
+               location.href = "labelPage/";
+            else if (data == "User is already login"){
+               alert(data)
+               location.href = ""
+            }
+            else {
+               alert("You have not login yet, please login first!")
+               $('#myModal').modal('show')
+            } 
+         },
+         error: function() {
+            alert("You have not login yet, please login first!")
+            $('#myModal').modal('show')
+         }
+      });
+
+   }
+
+   function tryLogin() {
+      
+      $.ajax( {
+         type: "POST",
+         url: "checkLogin/",
+         data: {
+            csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value
+         },
+         success: function (data) {
+            if (data == "success")
+               location.href = "";
+            else {
+               $('#myModal').modal('show')
+            } 
+         },
+         error: function() {
+            alert("You have not login yet, please login first!")
+            $('#myModal').modal('show')
+         }
+      });
+
+   }
+   function logout() {
+      $.ajax( {
+         type: "POST",
+         url: "userLogout/",
+         data: {
+            csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value
+         },
+         success: function (data) {
+            if (data == "success")
+               location.href = "";
+            else {
+               alert("data")
+            } 
+         },
+         error: function() {
+            alert("Something wrong!")
+            location.href = "";
+         }
+      });
+   }
+</script>
+<body>
+
+<nav class="navbar navbar-default" role="navigation">
+   <div class="navbar-header">
+      <a class="navbar-brand" href="#">Paraphrase Dictionary</a>
+   </div>
+   <div>
+      <ul class="nav navbar-nav">
+         {% if not hasLogin %}  
+         <li class="active"><a href="#">Unknow User</a></li>
+         <li><a onclick="tryLogin()" href="#">login</a></li>
+         {% else %}
+         <li class="active"><a href="#">{{ username }}</a></li>
+         
+         <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+               Profile 
+               <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+               <li><a href="#">My task done: {{ taskCount }}</a></li>
+               <li><a href="#">Confidence: {{ confidence }}</a></li>
+               <li><a href="#">Level: {{ level }}</a></li>
+               <li class="divider"></li>
+               <li><a onclick="logout()" href="#">logout</a></li>
+            </ul>
+         </li>
+         <li><a href="labelPage">Start now!</a></li>
+         {% endif %}
+         
+
+      </ul>
+   </div>
+</nav>
+
+<h2>Are you ready?</h2>
+<!-- 按钮触发模态框 -->
+<button class="btn btn-primary btn-lg" onclick="checkLogin()">
+   Yes!
+</button>
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   {% csrf_token %}
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="myModalLabel">
+               Please enter your name!
+            </h4>
+         </div>
+         <div class="modal-body">
+            <input type="text" id="username">
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" 
+               data-dismiss="modal">关闭
+            </button>
+            <button type="button" class="btn btn-primary" onclick="login()">
+               提交
+            </button>
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+</body>
+</html>

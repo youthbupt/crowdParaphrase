@@ -47,6 +47,6 @@ def InsertFromFile(request):
 
 def cleanParaphraseDatabase(request):
 	MongoUtils.cleanAllPhrase()
-
+	return HTTPResponse("Delete all paraphrase!")
 
 # Create your views here.

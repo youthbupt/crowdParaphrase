@@ -43,12 +43,18 @@ def InsertFromFile(request):
 	("yago", "/media/database/patty-dataset/yago-relation-paraphrases.txt")]
 	for (source, path) in fileInfo:
 		InsertToDatabase(source, path)
-	return HTTPResponse("Success!")
+	print "insert all phrase information to database!"
+	return HttpResponse("Success!")
 
 def cleanParaphraseDatabase(request = None):
 	MongoUtils.cleanAllPhrase()
 	print "remove all paraphrase!"
-	return HTTPResponse("Delete all paraphrase!")
+	return HttpResponse("Delete all paraphrase!")
+
+def removeAllUsers(request = None):
+	MongoUtils.removeAllUsers()
+	print "remove all users' profile!"
+	return HttpResponse("Success!")
 
 if __name__ == "__main__":
 	cleanParaphraseDatabase()

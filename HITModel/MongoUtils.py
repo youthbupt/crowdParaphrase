@@ -10,7 +10,7 @@ class MongoUtils():
 			db_object = db_objects[0]
 			flag = True
 		else:
-			db_object = dbPhrase(source = source, pname = db_phrase)
+			db_object = dbPhrase(ID = dbPhrase.objects.count() + 1, source = source, pname = db_phrase)
 			db_object.save()
 			flag = False
 		return flag, db_object
@@ -22,7 +22,7 @@ class MongoUtils():
 			nlp_object = nlp_objects[0]
 			flag = True
 		else:
-			nlp_object = nlpPhrase(pname = nlp_phrase)
+			nlp_object = nlpPhrase(ID = nlpPhrase.objects.count() + 1, pname = nlp_phrase)
 			nlp_object.save()
 			flag = False
 		return flag, nlp_object
@@ -31,16 +31,16 @@ class MongoUtils():
 	def insertCandidate(db, cand_list, confidence = 1.0):
 		match_pairs = []
 		for cand in cand_list:
-			match_pairs.append(MatchPair(NLPParaphrase = cand, confidence = confidence))
+			match_pairs.append(matchPair(NLPParaphrase = cand, confidence = confidence))
 		cand_object = paraCand(ID = paraCand.objects.count() + 1, DbpediaParaphrase = db, candidates = match_pairs)
-		cand.save()
+		cand_object.save()
 
 	@staticmethod
 	def userRegister(username):
 		print "%s tries to login or register" % username
 		user_object = User.objects(uname = username)
 		if len(user_object) == 0:
-			user_object = User(uname = username, confidence = 0.0, level = 0, taskCount = 0)
+			user_object = User(ID = User.objects.count() + 1, uname = username, confidence = 0.0, level = 0, taskCount = 0)
 			user_object.save()
 			print "A new user %s has just registered" % username
 			return False, user_object
@@ -53,6 +53,10 @@ class MongoUtils():
 		paraCand.objects().delete()
 		nlpPhrase.objects().delete()
 		dbPhrase.objects().delete()
+
+	@staticmethod
+	def removeAllUsers():
+		User.objects().delete()
 
 
 	@staticmethod

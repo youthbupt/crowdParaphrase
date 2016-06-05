@@ -11,34 +11,41 @@ except:
 connect(DBNAME)
 
 class NLPParaphrase(Document):
-	pname = StringField(primary_key = True, max_length = 50)
+	ID = IntField(primary_key = True, min_value = 1)
+	pname = StringField(max_length = 50)
 
 class MatchPair(EmbeddedDocument):
+	# maybe here does not need an id
+	# ID = IntField(primary_key = True, min_value = 1)
 	NLPParaphrase = ReferenceField(NLPParaphrase)
 	confidence = DecimalField()
 
 class DatabaseParaphrase(Document):
+	ID = IntField(primary_key = True, min_value = 1)
 	source = StringField(max_length = 15)
-	pname = StringField(primary_key = True, max_length = 50)
+	pname = StringField(max_length = 50)
 
 class ParaphraseCandidate(Document):
-	ID = IntField(min_value = 1)
+	ID = IntField(primary_key = True, min_value = 1)
 	DbpediaParaphrase = ReferenceField(DatabaseParaphrase)
 	candidates = ListField(EmbeddedDocumentField(MatchPair))
 
 class User(Document):
-	uname = StringField(primary_key = True, max_length = 100)
+	ID = IntField(primary_key = True, min_value = 1)
+	uname = StringField(max_length = 100)
 	confidence = DecimalField()
 	level = IntField()
 	taskCount = IntField()
 
 class HITClusterRes(Document):
+	ID = IntField(primary_key = True, min_value = 1)
 	user = ReferenceField(User)
 	posRes = ListField(ReferenceField(NLPParaphrase))
 	negRes = ListField(ReferenceField(NLPParaphrase))
 	date = DateTimeField()
 
 class HITMatchRes(Document):
+	ID = IntField(primary_key = True, min_value = 1)
 	user = ReferenceField(User)
 	dbPara = ReferenceField(DatabaseParaphrase)
 	cluster = ListField(EmbeddedDocumentField(MatchPair))

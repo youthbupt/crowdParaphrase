@@ -35,12 +35,19 @@ def InsertToDatabase(source, path):
 
 				
 		#insert database paraphrase's candidates
-		for db_phrase, cand_list in dbCandSet:
+		for db_phrase, cand_list in dbCandSet.items():
+			print db_phrase
+			print cand_list
 			MongoUtils.insertCandidate(db_phrase, cand_list)
 			
 def InsertFromFile(request):
+	"""
+	fileInfo = [ ("yago", "/media/database/patty-dataset/yago-relation-paraphrases.txt")]
+	"""
+	
 	fileInfo = [("dbpedia", "/media/database/patty-dataset/dbpedia-relation-paraphrases.txt"), 
 	("yago", "/media/database/patty-dataset/yago-relation-paraphrases.txt")]
+	
 	for (source, path) in fileInfo:
 		InsertToDatabase(source, path)
 	print "insert all phrase information to database!"

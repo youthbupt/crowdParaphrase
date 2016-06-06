@@ -1,6 +1,7 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from userViews import *
+from labelView import *
 from HITModel.views import *
 import sys
 
@@ -10,10 +11,10 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
 
     # These interfaces are dangerous
-    url(r'^removeParaphrase/?$', cleanParaphraseDatabase),
-    url(r'^buildDatabaseFromFile/?$', InsertFromFile),
-    url(r'^removeUserProfile/?$', removeAllUsers),
-
+    # url(r'^removeParaphrase/?$', cleanParaphraseDatabase),
+    # url(r'^buildDatabaseFromFile/?$', InsertFromFile),
+    # url(r'^removeUserProfile/?$', removeAllUsers),
+    
     url(r'^labelPage/?$', getLabelPage),
     url(r'^$', getHomePage),
     url(r'^userLogout/?$', userLogout),

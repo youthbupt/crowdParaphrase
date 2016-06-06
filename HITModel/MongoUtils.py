@@ -31,6 +31,7 @@ class MongoUtils():
 	def insertCandidate(db, cand_list, confidence = 1.0):
 		match_pairs = []
 		for cand in cand_list:
+			# print 233,
 			match_pairs.append(matchPair(NLPParaphrase = cand, confidence = confidence))
 		cand_object = paraCand(ID = paraCand.objects.count() + 1, DbpediaParaphrase = db, candidates = match_pairs)
 		cand_object.save()

@@ -1,7 +1,9 @@
+{% load staticfiles %}
+
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>html5 drag &amp; drop 拖拽与拖放测试</title>
+<title>Label Page</title>
 <style>
 body{font-size:84%;}
 .dustbin{width:100px; height:260px; line-height:1.4; background-color:gray; font-size:36px; font-family:"微软雅黑", "Yahei Mono"; text-align:center; text-shadow:-1px -1px #bbb; float:left;}
@@ -16,78 +18,115 @@ body{font-size:84%;}
     -webkit-border-radius: 100px / 50px;
     -moz-border-radius: 100px / 50px;
     border-radius: 100px / 50px;
+    float: left;
 }
 </style>
+<script src="{% static "js/jquery.min.js" %}"></script>
 </head>
 
 <body>
 <div class="dustbin"><br />完<br />成</div>
 <div class="dragbox">
     {% for dbId, nlpId, pname in phraseList %}
-    	<div class="draglist" dbId={{ dbId }} nlpId={{ nlpId }} draggable="true">{{ pname }}</div>
+    	<div class="draglist" clusterId = {{ forloop.counter0 }} dbId={{ dbId }} nlpId={{ nlpId }} draggable="true">{{ pname }}</div>
     {% endfor %}
 </div>
 <div class="dragremind"></div>
 <script>
-var $ = function(selector) {
-	if (!selector) { return []; }
-	var arrEle = [];
-	if (document.querySelectorAll) {
-		arrEle = document.querySelectorAll(selector);
-	} else {
-		var oAll = document.getElementsByTagName("div"), lAll = oAll.length;
-		if (lAll) {
-			var i = 0;
-			for (i; i<lAll; i+=1) {
-				if (/^\./.test(selector)) {
-					if (oAll[i].className === selector.replace(".", "")) {
-						arrEle.push(oAll[i]);
-					}
-				} else if(/^#/.test(selector)) {
-					if (oAll[i].id === selector.replace("#", "")) {
-						arrEle.push(oAll[i]);
+	/*var $ = function(selector) {
+		if (!selector) { return []; }
+		var arrEle = [];
+		if (document.querySelectorAll) {
+			arrEle = document.querySelectorAll(selector);
+		} else {
+			var oAll = document.getElementsByTagName("div"), lAll = oAll.length;
+			if (lAll) {
+				var i = 0;
+				for (i; i<lAll; i+=1) {
+					if (/^\./.test(selector)) {
+						if (oAll[i].className === selector.replace(".", "")) {
+							arrEle.push(oAll[i]);
+						}
+					} else if(/^#/.test(selector)) {
+						if (oAll[i].id === selector.replace("#", "")) {
+							arrEle.push(oAll[i]);
+						}
 					}
 				}
 			}
 		}
+		return arrEle;
+	};*/
+
+	var eleDustbin = $(".dustbin")[0], eleDrags = $(".draglist")
+	lDrags = eleDrags.length
+	var clusterOnScreen = new Array(lDrags)
+	eleRemind = $(".dragremind")[0]
+	eleDrag = null;
+	for (var i=0; i<lDrags; i+=1) {
+		clusterId = parseInt(eleDrags[i].getAttribute("clusterId"))
+		nlpId = parseInt(eleDrags[i].getAttribute("nlpId"))
+		clusterOnScreen[clusterId] = new Array()
+		clusterOnScreen[clusterId].push(nlpId)
+		
+		eleDrags[i].onselectstart = function() {
+			return false;
+		};
+		eleDrags[i].ondragstart = function(ev) {
+			ev.dataTransfer.effectAllowed = "move";
+			ev.dataTransfer.setData("text", ev.target.innerHTML);
+			ev.dataTransfer.setDragImage(ev.target, 0, 0);
+			eleDrag = ev.target;
+			return true;
+		};
+		eleDrags[i].ondrop = function(ev) {
+			if (eleDrag != null && eleDrag != this) {
+
+				eleRemind.innerHTML = '<strong>合并了"' + this.innerHTML + '"和"' + eleDrag.innerHTML + '"</strong>';
+				if (this.innerHTML.substr(0, 4) != "<br>")
+					this.innerHTML = "<br>" + this.innerHTML
+				if (eleDrag.innerHTML.substr(0, 4) != "<br>")
+					this.innerHTML += ';<br> ' + eleDrag.innerHTML
+				else
+					this.innerHTML += ';<br> ' + eleDrag.innerHTML.substr(4)
+				this.style.height = this.offsetHeight + eleDrag.offsetHeight / 6 + "px"
+				this.style.width = this.offsetWidth + eleDrag.offsetWidth / 5 + "px"
+
+				id1 = parseInt(this.getAttribute("clusterId"))
+				id2 = parseInt(eleDrag.getAttribute("clusterId"))
+				if (id1 > id2) {
+					tmp = id1
+					id1 = id2
+					id2 = tmp
+				}
+				this.setAttribute("clusterId", id1)
+
+				clusterOnScreen[id1] = clusterOnScreen[id1].concat(clusterOnScreen[id2])
+				for (i = id2; i < clusterOnScreen.length - 1; i++) {
+					clusterOnScreen[i] = clusterOnScreen[i + 1]
+				}
+				clusterOnScreen.pop()
+
+				eleDrag.parentNode.removeChild(eleDrag);
+				eleDrag = null
+
+
+			}
+			this.style.color = "#000000";
+			return false;
+		};
+		eleDrags[i].ondragend = function(ev) {
+			ev.dataTransfer.clearData("text");
+			this.style.color = "#000000";
+			//eleDrag = null;
+			return false
+		};
+
+
 	}
-	return arrEle;
-};
-
-var eleDustbin = $(".dustbin")[0], eleDrags = $(".draglist"), lDrags = eleDrags.length, eleRemind = $(".dragremind")[0], eleDrag = null;
-for (var i=0; i<lDrags; i+=1) {
-	eleDrags[i].onselectstart = function() {
-		return false;
-	};
-	eleDrags[i].ondragstart = function(ev) {
-		ev.dataTransfer.effectAllowed = "move";
-		ev.dataTransfer.setData("text", ev.target.innerHTML);
-		ev.dataTransfer.setDragImage(ev.target, 0, 0);
-		eleDrag = ev.target;
-		return true;
-	};
-	eleDrags[i].ondrop = function(ev) {
-		if (eleDrag) {
-
-			eleRemind.innerHTML = '<strong>合并了"' + this.innerHTML + '"和"' + eleDrag.innerHTML + '"</strong>';
-			this.innerHTML += '; ' + eleDrag.innerHTML
-			this.style.height = this.offsetHeight + 5 + "px"
-			eleDrag.parentNode.removeChild(eleDrag);
-		}
-		this.style.color = "#000000";
-		return false;
-	};
-	eleDrags[i].ondragend = function(ev) {
-		ev.dataTransfer.clearData("text");
-		eleDrag = null;
-		return false
-	};
-
-
-}
 for (var i = 0; i < lDrags; i += 1) {
 	eleDrags[i].ondragover = function(ev) {
-		//this.style.color = "#ffffff";
+		//this.style.color = "#000000";
 		ev.preventDefault();
 		return true;
 	};
@@ -95,9 +134,15 @@ for (var i = 0; i < lDrags; i += 1) {
 		this.style.color = "#ffffff";
 		return true;
 	};
+	eleDrags[i].ondragleave = function(ev) {
+		this.style.color = "#000000";
+		ev.preventDefault();
+		return true;
+	};
 }
 eleDustbin.ondragover = function(ev) {
 	ev.preventDefault();
+
 	return true;
 };
 
@@ -113,6 +158,8 @@ eleDustbin.ondrop = function(ev) {
 	this.style.color = "#000000";
 	return false;
 };
+
+
 </script>
 </body>
 </html>

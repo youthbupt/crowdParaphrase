@@ -33,8 +33,8 @@ class PhraseUtils():
             if NLPPhraseCount + candLen <= MAX_NLP_PHRASE:
                 for nlp_phrase in nowCand.candidates:
                     selectedDict[nowCandId].append(nlp_phrase)
-                    print nlp_phrase
-                MAX_NLP_PHRASE += candLen
+                    #print nlp_phrase
+                NLPPhraseCount += candLen
             else:
                 cand = []
                 for nlp_phrase in nowCand.candidates:
@@ -42,15 +42,16 @@ class PhraseUtils():
                 random.shuffle(cand)
                 i = 0
                 while NLPPhraseCount < MAX_NLP_PHRASE:
-                    selectedDict[nowCandId].append(cand[i])
                     i += 1
+                    selectedDict[nowCandId].append(cand[i])
                     NLPPhraseCount += 1
-            print selectedDict[nowCandId]
+            #print selectedDict[nowCandId]
         resList = []
         for db_id, cand_list in selectedDict.items():
             for cand in cand_list:
                 resList.append((db_id, cand.NLPParaphrase.ID, cand.NLPParaphrase.pname))
         # print resList
+        print len(resList)
         return resList
 
 # Here is the test code

@@ -14,4 +14,5 @@ def getLabelPage(request):
 
     res = {}
     res["phraseList"] = PhraseUtils.getRandomHIT(request.session["labledPhrase"])
+    
     return render(request, "labelPage.html", res)

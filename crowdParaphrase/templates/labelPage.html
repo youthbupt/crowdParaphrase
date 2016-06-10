@@ -106,10 +106,10 @@ body{font-size:84%;}
 					clusterOnScreen[i] = clusterOnScreen[i + 1]
 				}
 				clusterOnScreen.pop()
-				for (i = 0; i < clusterOnScreen.length; i++) {
-					id = parseInt(clusterOnScreen[i].getAttribute("clusterId"))
+				for (i = 0; i < lDrags; i++) {
+					id = parseInt(eleDrags[i].getAttribute("clusterId"))
 					if (id > id2)
-						clusterOnScreen[i].setAttribute("clusterId", id - 1)
+						eleDrags[i].setAttribute("clusterId", id - 1)
 				}
 				eleDrag.parentNode.removeChild(eleDrag);
 				eleDrag = null
@@ -163,6 +163,10 @@ eleDustbin.ondrop = function(ev) {
 	return false;
 };
 
+	function submitResult(this) {
+		JSON.stringify(clusterOnScreen)
+		
+	}
 
 </script>
 </body>

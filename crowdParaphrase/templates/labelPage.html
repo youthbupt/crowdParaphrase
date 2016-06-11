@@ -27,6 +27,7 @@ body{font-size:84%;}
 <body>
 <div class="dustbin"><br />完<br />成</div>
 <div class="dragbox">
+	{% csrf_token %}
     {% for dbId, nlpId, pname in phraseList %}
     	<div class="draglist" clusterId = {{ forloop.counter0 }} dbId={{ dbId }} nlpId={{ nlpId }} draggable="true">{{ pname }}</div>
     {% endfor %}
@@ -165,7 +166,24 @@ eleDustbin.ondrop = function(ev) {
 
 	function submitResult(this) {
 		json_res = JSON.stringify(clusterOnScreen)
-
+	      $.ajax( {
+	         type: "POST",
+	         url: "userLogin",
+	         data: {
+	            "labledRes": json_res,
+	            csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value
+	         },
+	         success: function (data) {
+	            if (data == "success")
+	               location.href = "labelPage/";
+	            else {
+	               alert(data)
+	            }
+	         },
+	         error: function(data) {
+	            alert("Login failed, please check your username!")
+	         }
+	      });
 	}
 
 </script>

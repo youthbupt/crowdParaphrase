@@ -170,7 +170,7 @@ eleDustbin.ondrop = function(ev) {
 	         type: "POST",
 	         url: "userLogin",
 	         data: {
-	            "labledRes": json_res,
+	            labledRes: json_res,
 	            csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value
 	         },
 	         success: function (data) {

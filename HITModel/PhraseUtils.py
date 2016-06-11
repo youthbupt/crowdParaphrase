@@ -1,6 +1,6 @@
 #coding=utf8
 from MongoUtils import MongoUtils
-from model import ParaphraseCandidate
+from model import ParaphraseCandidate, NLPParaphrase
 import random
 
 # global parameters
@@ -53,6 +53,24 @@ class PhraseUtils():
         # print resList
         print len(resList)
         return resList
+
+    @staticmethod
+    def getNLPPhrase(phraseId):
+        phrase = NLPParaphrase.objects(ID = phraseId)
+        if len(phrase) == 0:
+            return None
+        return phrase[0]
+
+    @staticmethod
+    def insertLabeledRes(user, cluster_list):
+        for cluster in cluster_list:
+            nowCluster = []
+            for phraseId in cluster:
+                ID = int(phraseId)
+                nowPhrase = getNLPPhrase(ID)
+                if nowPhrase is not None:
+                    nowCluster.append(nowPhrase)
+
 
 # Here is the test code
 if __name__ == "__main__":

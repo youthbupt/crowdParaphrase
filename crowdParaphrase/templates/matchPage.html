@@ -1,0 +1,131 @@
+{% load staticfiles %}
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Label Page</title>
+<style>
+body{font-size:84%;}
+.dustbin{width:100px; height:260px; line-height:1.4; background-color:gray; font-size:36px; font-family:"微软雅黑", "Yahei Mono"; text-align:center; text-shadow:-1px -1px #bbb; float:left;}
+.dragbox{width:500px; padding-left:20px; float:left;}
+.draglist{padding:10px; margin-bottom:5px; border:2px dashed #ccc; background-color:#eee; cursor:move;}
+.draglist:hover{border-color:#cad5eb; background-color:#f0f3f9;}
+.dragremind{padding-top:2em; clear:both;}
+.draglist {
+    width: 100px;
+    height: 50px;
+    background: #ffffff;
+    -webkit-border-radius: 100px / 50px;
+    -moz-border-radius: 100px / 50px;
+    border-radius: 100px / 50px;
+    float: left;
+}
+</style>
+<script src="{% static "js/jquery.min.js" %}"></script>
+</head>
+
+<body>
+<div class="dustbin"><br />完<br />成</div>
+<div class="dragbox">
+	{% csrf_token %}
+    {% for dbId, nlpId, pname in phraseList %}
+    	<div class="draglist" clusterId = {{ forloop.counter0 }} dbId={{ dbId }} nlpId={{ nlpId }} draggable="true">{{ pname }}</div>
+    {% endfor %}
+</div>
+<div class="dragremind"></div>
+<script>
+	var eleDustbin = $(".dustbin")[0], eleDrags = $(".draglist")
+	lDrags = eleDrags.length
+	var clusterOnScreen = new Array(lDrags)
+	eleRemind = $(".dragremind")[0]
+	eleDrag = null;
+	for (var i=0; i<lDrags; i+=1) {
+		clusterId = parseInt(eleDrags[i].getAttribute("clusterId"))
+		nlpId = parseInt(eleDrags[i].getAttribute("nlpId"))
+		dbId = parseInt(eleDrags[i].getAttribute("dbId"))
+		clusterOnScreen[clusterId] = new Array()
+		clusterOnScreen[clusterId].push([nlpId, dbId])
+		
+		eleDrags[i].onselectstart = function() {
+			return false;
+		};
+		eleDrags[i].ondragstart = function(ev) {
+			ev.dataTransfer.effectAllowed = "move";
+			ev.dataTransfer.setData("text", ev.target.innerHTML);
+			ev.dataTransfer.setDragImage(ev.target, 0, 0);
+			eleDrag = ev.target;
+			return true;
+		};
+		eleDrags[i].ondrop = function(ev) {
+			this.style.color = "#000000";
+			return false;
+		};
+		eleDrags[i].ondragend = function(ev) {
+			ev.dataTransfer.clearData("text");
+			this.style.color = "#000000";
+			//eleDrag = null;
+			return false
+		};
+
+
+	}
+for (var i = 0; i < lDrags; i += 1) {
+	eleDrags[i].ondragover = function(ev) {
+		//this.style.color = "#000000";
+		ev.preventDefault();
+		return true;
+	};
+	eleDrags[i].ondragenter = function(ev) {
+		this.style.color = "#ffffff";
+		return true;
+	};
+	eleDrags[i].ondragleave = function(ev) {
+		this.style.color = "#000000";
+		ev.preventDefault();
+		return true;
+	};
+}
+eleDustbin.ondragover = function(ev) {
+	ev.preventDefault();
+
+	return true;
+};
+
+eleDustbin.ondragenter = function(ev) {
+	this.style.color = "#ffffff";
+	return true;
+};
+eleDustbin.ondrop = function(ev) {
+	if (eleDrag) {
+		eleRemind.innerHTML = '<strong>Cluster:"' + eleDrag.innerHTML + '"</strong>合并完成';
+		eleDrag.parentNode.removeChild(eleDrag);
+	}
+	this.style.color = "#000000";
+	return false;
+};
+
+	function submitResult(this) {
+		json_res = JSON.stringify(clusterOnScreen)
+	      $.ajax( {
+	         type: "POST",
+	         url: "userLogin",
+	         data: {
+	            labledRes: json_res,
+	            csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value
+	         },
+	         success: function (data) {
+	            if (data == "success")
+	               location.href = "labelPage/";
+	            else {
+	               alert(data)
+	            }
+	         },
+	         error: function(data) {
+	            alert("Login failed, please check your username!")
+	         }
+	      });
+	}
+
+</script>
+</body>
+</html>

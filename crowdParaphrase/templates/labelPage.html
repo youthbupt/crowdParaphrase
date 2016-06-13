@@ -12,8 +12,8 @@ body{font-size:84%;}
 .draglist:hover{border-color:#cad5eb; background-color:#f0f3f9;}
 .dragremind{padding-top:2em; clear:both;}
 .draglist {
-    width: 100px;
-    height: 50px;
+    width: 150px;
+    height: 70px;
     background: #ffffff;
     -webkit-border-radius: 100px / 50px;
     -moz-border-radius: 100px / 50px;
@@ -22,9 +22,67 @@ body{font-size:84%;}
 }
 </style>
 <script src="{% static "js/jquery.min.js" %}"></script>
+<script src="{% static "js/bootstrap.min.js" %}"></script>
+<script>
+	function submitResult() {
+		json_res = JSON.stringify(clusterOnScreen)
+	      $.ajax( {
+	         type: "POST",
+	         url: "/saveLabeledRes",
+	         data: {
+	            labeledRes: json_res,
+	            csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value
+	         },
+	         success: function (data) {
+	            if (data == "success")
+	               location.href = "/";
+	            else {
+	               alert(data)
+	            }
+	         },
+	         error: function(data) {
+	            alert("Login failed, please check your username!")
+	         }
+	      });
+	}
+</script>
+<link href="http://libs.baidu.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body>
+<nav class="navbar navbar-default" role="navigation">
+   <div class="navbar-header">
+      <a class="navbar-brand" href="#">Paraphrase Dictionary</a>
+   </div>
+   <div>
+      <ul class="nav navbar-nav">
+         {% if not hasLogin %}  
+         <li class="active"><a href="#">Unknow User</a></li>
+         <li><a onclick="tryLogin()" href="#">login</a></li>
+         {% else %}
+         <li class="active"><a href="#">{{ username }}</a></li>
+         
+         <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+               Profile 
+               <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+               <li><a href="#">My task done: {{ taskCount }}</a></li>
+               <li><a href="#">Confidence: {{ confidence }}</a></li>
+               <li><a href="#">Level: {{ level }}</a></li>
+               <li class="divider"></li>
+               <li><a onclick="logout()" href="#">logout</a></li>
+            </ul>
+         </li>
+         <li><a href="labelPage">Start now!</a></li>
+         {% endif %}
+         
+
+      </ul>
+   </div>
+</nav>
+
 <div class="dustbin"><br />完<br />成</div>
 <div class="dragbox">
 	{% csrf_token %}
@@ -33,6 +91,9 @@ body{font-size:84%;}
     {% endfor %}
 </div>
 <div class="dragremind"></div>
+<button type="button" class="btn btn-primary" onclick="submitResult()">
+    submit
+</button>
 <script>
 	/*var $ = function(selector) {
 		if (!selector) { return []; }
@@ -67,8 +128,9 @@ body{font-size:84%;}
 	for (var i=0; i<lDrags; i+=1) {
 		clusterId = parseInt(eleDrags[i].getAttribute("clusterId"))
 		nlpId = parseInt(eleDrags[i].getAttribute("nlpId"))
+		dbId = parseInt(eleDrags[i].getAttribute("dbId"))
 		clusterOnScreen[clusterId] = new Array()
-		clusterOnScreen[clusterId].push(nlpId)
+		clusterOnScreen[clusterId].push([nlpId, dbId])
 		
 		eleDrags[i].onselectstart = function() {
 			return false;
@@ -126,66 +188,41 @@ body{font-size:84%;}
 			//eleDrag = null;
 			return false
 		};
-
-
 	}
-for (var i = 0; i < lDrags; i += 1) {
-	eleDrags[i].ondragover = function(ev) {
-		//this.style.color = "#000000";
+	for (var i = 0; i < lDrags; i += 1) {
+		eleDrags[i].ondragover = function(ev) {
+			//this.style.color = "#000000";
+			ev.preventDefault();
+			return true;
+		};
+		eleDrags[i].ondragenter = function(ev) {
+			this.style.color = "#ffffff";
+			return true;
+		};
+		eleDrags[i].ondragleave = function(ev) {
+			this.style.color = "#000000";
+			ev.preventDefault();
+			return true;
+		};
+	}
+	eleDustbin.ondragover = function(ev) {
 		ev.preventDefault();
+
 		return true;
 	};
-	eleDrags[i].ondragenter = function(ev) {
+
+	eleDustbin.ondragenter = function(ev) {
 		this.style.color = "#ffffff";
 		return true;
 	};
-	eleDrags[i].ondragleave = function(ev) {
+	eleDustbin.ondrop = function(ev) {
+		if (eleDrag) {
+			eleRemind.innerHTML = '<strong>Cluster:"' + eleDrag.innerHTML + '"</strong>合并完成';
+			eleDrag.parentNode.removeChild(eleDrag);
+		}
 		this.style.color = "#000000";
-		ev.preventDefault();
-		return true;
+		return false;
 	};
-}
-eleDustbin.ondragover = function(ev) {
-	ev.preventDefault();
-
-	return true;
-};
-
-eleDustbin.ondragenter = function(ev) {
-	this.style.color = "#ffffff";
-	return true;
-};
-eleDustbin.ondrop = function(ev) {
-	if (eleDrag) {
-		eleRemind.innerHTML = '<strong>Cluster:"' + eleDrag.innerHTML + '"</strong>合并完成';
-		eleDrag.parentNode.removeChild(eleDrag);
-	}
-	this.style.color = "#000000";
-	return false;
-};
-
-	function submitResult(this) {
-		json_res = JSON.stringify(clusterOnScreen)
-	      $.ajax( {
-	         type: "POST",
-	         url: "userLogin",
-	         data: {
-	            labledRes: json_res,
-	            csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value
-	         },
-	         success: function (data) {
-	            if (data == "success")
-	               location.href = "labelPage/";
-	            else {
-	               alert(data)
-	            }
-	         },
-	         error: function(data) {
-	            alert("Login failed, please check your username!")
-	         }
-	      });
-	}
-
 </script>
 </body>
 </html>

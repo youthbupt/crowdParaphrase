@@ -21,12 +21,7 @@ def getUserObject(request):
     user = None
     if "user" in request.session:
         user = MongoUtils.getUser(request.session["user"])
-    return user
-
-def getHomePage(request):
     res = {}
-    user = getUserObject(request)
-
     if user is not None:
         res['hasLogin'] = True
         res["username"] = user.uname
@@ -35,6 +30,10 @@ def getHomePage(request):
         res["taskCount"] = user.taskCount
     else:
         res['hasLogin'] = False
+    return res
+
+def getHomePage(request):
+    res = getUserObject(request)
     return render(request, "home.html", res)
 
 def checkLogin(request):

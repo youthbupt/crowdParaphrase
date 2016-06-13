@@ -1,11 +1,12 @@
 #coding=utf8
 from MongoUtils import MongoUtils
-from model import ParaphraseCandidate, NLPParaphrase
+from model import ParaphraseCandidate, NLPParaphrase, HITClusterPositiveRes, HITClusterNegativeRes
 import random
+from datetime import datetime
 
 # global parameters
 candPairLen = len(ParaphraseCandidate.objects)
-print "length of paraphrase candidates list: %d" % candPairLen
+# print "length of paraphrase candidates list: %d" % candPairLen
 
 class PhraseUtils():
 
@@ -51,7 +52,7 @@ class PhraseUtils():
             for cand in cand_list:
                 resList.append((db_id, cand.NLPParaphrase.ID, cand.NLPParaphrase.pname))
         # print resList
-        print len(resList)
+        # print len(resList)
         return resList
 
     @staticmethod
@@ -63,16 +64,65 @@ class PhraseUtils():
 
     @staticmethod
     def insertLabeledRes(user, cluster_list):
+
         for cluster in cluster_list:
             nowCluster = []
-            for phraseId in cluster:
-                ID = int(phraseId)
-                nowPhrase = getNLPPhrase(ID)
+            dbParaList = []
+            for nlpId, dbId in cluster:
+                nlpId = int(nlpId)
+                dbId = int(dbId)
                 if nowPhrase is not None:
-                    nowCluster.append(nowPhrase)
+                    nowCluster.append(nlpId)
+                if dbId not in dbParaList:
+                    dbParaList.append(dbId)
 
+            posObj = HITClusterPositiveRes(ID = len(HITClusterPositiveRes.objects()) + 1, user = user, \
+                dbPara = dbParaList, cluster = nowCluster, date = datetime.now())
+            posObj.save()
+
+        l = len(cluster_list)
+        if l == 0: return
+        for x in xrange(l):
+            cluster = cluster_list[x]
+            for phraseId in cluster:
+                negPhrase = []
+                for y in xrange(l):
+                    if x == y:continue
+                    neg_cluster = cluster_list[y]
+                    for neg in neg_cluster:
+                        negPhrase.append(neg)
+                if len(negPhrase) > 0:
+                    negObj = HITClusterNegativeRes(ID = len(HITClusterNegativeRes.objects() + 1), \
+                        nlp_phrase = nlp_phrase, user = user, cluster = negPhrase, date = datetime.now())
+                    negObj.save()
+
+    @staticmethod
+    def cleanLabeledRes():
+        HITClusterPositiveRes.objects().delete()
+        HITClusterNegativeRes.objects().delete()
+
+def testGetRandomHIT():
+    preSet = set()
+    res = PhraseUtils.getRandomHIT(preSet)
+    print res
+
+def testSavedLabelRes():
+    print "---------- positive clusters ------------"
+    for pos_clusters in HITClusterPositiveRes.objects():
+        print "user:", pos_clusters.user.uname
+        print "database paraphrase list:", pos_clusters.dbPara
+        print "positive cluster:", pos_cluster.cluster
+        print "date:", pos_cluster.date
+
+    print
+
+    print "---------- negative clusters ------------"
+    for neg_clusters in HITClusterNegativeRes.objects():
+        print "user:", neg_clusters.user.uname
+        print "database paraphrase list:", neg_clusters.dbPara
+        print "positive cluster:", neg_clusters.cluster
+        print "date:", neg_clusters.date
 
 # Here is the test code
 if __name__ == "__main__":
-    preSet = set()
-    PhraseUtils.getRandomHIT(preSet)
+    testSavedLabelRes()

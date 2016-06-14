@@ -146,8 +146,10 @@ body{font-size:84%;}
 			if (eleDrag != null && eleDrag != this) {
 
 				eleRemind.innerHTML = '<strong>合并了"' + this.innerHTML + '"和"' + eleDrag.innerHTML + '"</strong>';
+				/*
 				if (this.innerHTML.substr(0, 4) != "<br>")
 					this.innerHTML = "<br>" + this.innerHTML
+				*/
 				if (eleDrag.innerHTML.substr(0, 4) != "<br>")
 					this.innerHTML += ';<br> ' + eleDrag.innerHTML
 				else
@@ -155,8 +157,8 @@ body{font-size:84%;}
 				id1 = parseInt(this.getAttribute("clusterId"))
 				id2 = parseInt(eleDrag.getAttribute("clusterId"))
 				
-				this.style.height = this.offsetHeight + clusterOnScreen[id1].length * eleDrag.offsetHeight / 9 + "px"
-				this.style.width = this.offsetWidth + 7 + "px"
+				this.style.height = this.offsetHeight + Math.sqrt(clusterOnScreen[id1].length + 1) * eleDrag.offsetHeight / 7 + "px"
+				this.style.width = this.offsetWidth + Math.sqrt(clusterOnScreen[id1].length + 1) * 7 + "px"
 
 				id1 = parseInt(this.getAttribute("clusterId"))
 				id2 = parseInt(eleDrag.getAttribute("clusterId"))

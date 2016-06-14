@@ -1,6 +1,7 @@
 #coding=utf8
 from model import NLPParaphrase as nlpPhrase, DatabaseParaphrase as dbPhrase,\
 ParaphraseCandidate as paraCand, MatchPair as matchPair, User 
+from mongoengine import *
 
 class MongoUtils():
     @staticmethod
@@ -66,3 +67,21 @@ class MongoUtils():
         if len(user_object) == 0:
             return None
         return user_object[0]
+
+    @staticmethod
+    def transInt2IntField(intArr):
+        res = []
+        for i in intArr:
+            now = IntField()
+            now.value = i
+            res.append(now)
+        return res
+
+    @staticmethod
+    def transFloat2FloatField(floatArr):
+        res = []
+        for i in floatArr:
+            now = FloatField()
+            now.value = i
+            res.append(now)
+        return res

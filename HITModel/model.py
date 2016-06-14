@@ -18,7 +18,7 @@ class MatchPair(EmbeddedDocument):
     # maybe here does not need an id
     # ID = IntField(primary_key = True, min_value = 1)
     NLPParaphrase = ReferenceField(NLPParaphrase)
-    confidence = DecimalField()
+    confidence = FloatField()
 
 class DatabaseParaphrase(Document):
     ID = IntField(primary_key = True, min_value = 1)
@@ -33,23 +33,26 @@ class ParaphraseCandidate(Document):
 class User(Document):
     ID = IntField(primary_key = True, min_value = 1)
     uname = StringField(max_length = 100)
-    confidence = DecimalField()
+    confidence = FloatField()
     level = IntField()
     taskCount = IntField()
+
+class CandDBPhrase(EmbeddedDocument):
+    DatabaseParaphrase = ReferenceField(DatabaseParaphrase)
+    prob = FloatField()
 
 class HITClusterPositiveRes(Document):
     ID = IntField(primary_key = True, min_value = 1)
     user = ReferenceField(User)
-    dbPara = ListField(IntField)
-    dbParaProb = ListField(DecimalField())
-    cluster = ListField(IntField())
+    dbPara = ListField(EmbeddedDocumentField(CandDBPhrase))
+    cluster = ListField(ReferenceField(NLPParaphrase))
     date = DateTimeField()
 
 class HITClusterNegativeRes(Document):
     ID = IntField(primary_key = True, min_value = 1)
-    nlp_phrase = IntField()
+    nlp_phrase = ReferenceField(NLPParaphrase)
     user = ReferenceField(User)
-    cluster = ListField(IntField)
+    cluster = ListField(ReferenceField(NLPParaphrase))
     date = DateTimeField()
 
 class HITMatchRes(Document):

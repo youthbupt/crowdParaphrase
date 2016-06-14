@@ -67,15 +67,18 @@ class PhraseUtils():
 
         for cluster in cluster_list:
             nowCluster = []
-            dbParaList = []
+            dbParaCount = {}
+            clusterLen = len(cluster)
             for nlpId, dbId in cluster:
                 nlpId = int(nlpId)
                 dbId = int(dbId)
-                if nowPhrase is not None:
+                if nlpId is not None:
                     nowCluster.append(nlpId)
-                if dbId not in dbParaList:
-                    dbParaList.append(dbId)
-
+                if dbId not in dbParaCount:
+                    dbParaCount[dbId] = 1.0 / clusterLen
+                else:
+                    dbParaCount[dbId] += 1.0 / clusterLen
+            dbParaList = dbParaCount.items()
             posObj = HITClusterPositiveRes(ID = len(HITClusterPositiveRes.objects()) + 1, user = user, \
                 dbPara = dbParaList, cluster = nowCluster, date = datetime.now())
             posObj.save()

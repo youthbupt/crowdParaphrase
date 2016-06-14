@@ -152,8 +152,11 @@ body{font-size:84%;}
 					this.innerHTML += ';<br> ' + eleDrag.innerHTML
 				else
 					this.innerHTML += ';<br> ' + eleDrag.innerHTML.substr(4)
-				this.style.height = this.offsetHeight + eleDrag.offsetHeight / 6 + "px"
-				this.style.width = this.offsetWidth + eleDrag.offsetWidth / 5 + "px"
+				id1 = parseInt(this.getAttribute("clusterId"))
+				id2 = parseInt(eleDrag.getAttribute("clusterId"))
+				
+				this.style.height = this.offsetHeight + clusterOnScreen[id1].length * eleDrag.offsetHeight / 9 + "px"
+				this.style.width = this.offsetWidth + 7 + "px"
 
 				id1 = parseInt(this.getAttribute("clusterId"))
 				id2 = parseInt(eleDrag.getAttribute("clusterId"))

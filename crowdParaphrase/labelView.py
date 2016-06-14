@@ -33,9 +33,10 @@ def saveLabeledRes(request):
     print request.method
     if request.method == "POST":
        labeledRes = request.POST.get("labeledRes", None)
+
     if labeledRes is None:
         return HttpResponse("No request data")
     res = json.loads(labeledRes)
-    PhraseUtils.insertLabeledRes(res)
+    PhraseUtils.insertLabeledRes(user, res)
     return HttpResponse("Success")
 

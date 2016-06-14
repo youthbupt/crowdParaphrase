@@ -78,9 +78,12 @@ class PhraseUtils():
                     dbParaCount[dbId] = 1.0 / clusterLen
                 else:
                     dbParaCount[dbId] += 1.0 / clusterLen
-            dbParaList = dbParaCount.items()
+            # dbParaList = dbParaCount.items()
+            print dbParaCount.keys()
+            print dbParaCount.values()
             posObj = HITClusterPositiveRes(ID = len(HITClusterPositiveRes.objects()) + 1, user = user, \
-                dbPara = dbParaList, cluster = nowCluster, date = datetime.now())
+                dbPara = dbParaCount.keys(), dbParaProb = dbParaCount.values(), cluster = nowCluster, \
+                date = datetime.now())
             posObj.save()
 
         l = len(cluster_list)
@@ -125,6 +128,16 @@ def testSavedLabelRes():
         print "database paraphrase list:", neg_clusters.dbPara
         print "positive cluster:", neg_clusters.cluster
         print "date:", neg_clusters.date
+
+
+def testInsertLabeledRes():
+    user = User.objects(uname = "ys")
+    cluster_list = [[[29129,134]],[[29096,134]],[[29130,134]],[[29109,134]],[[29121,134]],[[29100,134]],\
+    [[29108,134]],[[29099,134]],[[29116,134]],[[29112,134]],[[29092,134]],[[29143,134]],[[29119,134]],\
+    [[29111,134],[29101,134],[29118,134],[29125,134],[29136,134],[29137,134]],[[29097,134]]]
+    
+    PhraseUtils.insertLabeledRes(user, cluster_list)
+
 
 # Here is the test code
 if __name__ == "__main__":

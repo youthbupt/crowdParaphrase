@@ -40,8 +40,9 @@ class User(Document):
 class HITClusterPositiveRes(Document):
     ID = IntField(primary_key = True, min_value = 1)
     user = ReferenceField(User)
-    dbPara = ListField((IntField, DecimalField))
-    cluster = ListField(IntField)
+    dbPara = ListField(IntField)
+    dbParaProb = ListField(DecimalField())
+    cluster = ListField(IntField())
     date = DateTimeField()
 
 class HITClusterNegativeRes(Document):

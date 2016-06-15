@@ -74,6 +74,7 @@ class PhraseUtils():
     def insertLabeledRes(user, cluster_list):
         nlpParaDict = {}
         dbParaDict = {}
+        posIdList = []
         for cluster in cluster_list:
             nowCluster = []
             dbParaCount = {}
@@ -102,7 +103,9 @@ class PhraseUtils():
             if len(nowCluster) < 1 or len(dbPara) < 1:
                 continue
 
-            posObj = HITClusterPositiveRes(ID = len(HITClusterPositiveRes.objects()) + 1, user = user, \
+            posId = len(HITClusterPositiveRes.objects()) + 1
+            posIdList.append(posId)
+            posObj = HITClusterPositiveRes(ID = posId, user = user, \
                 dbPara = dbPara, cluster = nowCluster, date = datetime.now())
             posObj.save()
 
@@ -129,6 +132,33 @@ class PhraseUtils():
                     negObj = HITClusterNegativeRes(ID = len(HITClusterNegativeRes.objects()) + 1, \
                         nlp_phrase = nlpObj, user = user, cluster = negPhrase, date = datetime.now())
                     negObj.save()
+        return posIdList
+
+    @staticmethod
+    def getPosCluster(clusterId):
+        clusters = HITClusterPositiveRes.objects(ID = clusterId)
+        if len(clusters) > 0:
+            return clusters[0]
+        return None
+
+    @staticmethod
+    def getMatchHIT(clusterList, EACH_CLUSTER_SHOWN_COUNT = 3):
+        posCluster = []
+        dbParaList = []
+        for cid in clusterList:
+            cluster = getPosCluster(cid)
+            if cluster is not None:
+                
+                nlpParaList = []
+                for dbPara in cluster.dbPara:
+                    if dbPara.DatabaseParaphrase.ID not in dbParaList:
+                        dbParaList.append(dbPara.DatabaseParaphrase.ID)
+                for nlpPara in cluster.cluster:
+                    nlpParaList.append(nlpPara.ID)
+                random.shuffle(nlpParaList)
+                posCluster.append((cid, nlpParaList[:EACH_CLUSTER_SHOWN_COUNT]))
+        return dbParaList, posCluster
+
 
     @staticmethod
     def cleanLabeledRes():

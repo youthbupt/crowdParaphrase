@@ -145,18 +145,38 @@ class PhraseUtils():
     def getMatchHIT(clusterList, EACH_CLUSTER_SHOWN_COUNT = 3):
         posCluster = []
         dbParaList = []
+        dbParaSet = set()
         for cid in clusterList:
-            cluster = getPosCluster(cid)
+            cluster = PhraseUtils.getPosCluster(cid)
             if cluster is not None:
                 
                 nlpParaList = []
                 for dbPara in cluster.dbPara:
-                    if dbPara.DatabaseParaphrase.ID not in dbParaList:
-                        dbParaList.append(dbPara.DatabaseParaphrase.ID)
+                    if dbPara.DatabaseParaphrase.ID not in dbParaSet:
+                        dbParaSet.add(dbPara.DatabaseParaphrase.ID)
+                        dbParaDict = {}
+                        dbParaDict["dbId"] = dbPara.DatabaseParaphrase.ID
+                        dbParaDict["dbParaName"] = dbPara.DatabaseParaphrase.pname
+                        dbParaList.append(dbParaDict)
+                nowCluster = []
                 for nlpPara in cluster.cluster:
-                    nlpParaList.append(nlpPara.ID)
-                random.shuffle(nlpParaList)
-                posCluster.append((cid, nlpParaList[:EACH_CLUSTER_SHOWN_COUNT]))
+                    if len(nlpParaList) >= EACH_CLUSTER_SHOWN_COUNT:
+                        break
+                    """
+                    nlpParaDict = {}
+                    nlpParaDict["nlpId"] = nlpPara.ID
+                    nlpParaDict["nlpName"] = nlpPara.pname
+                    # nlpParaList.append(nlpPara.ID)
+                    nowCluster.append(nlpParaDict)
+                    """
+                    nowCluster.append(nlpPara.pname)
+                # random.shuffle(nlpParaList)
+                # posCluster.append((cid, nlpParaList[:EACH_CLUSTER_SHOWN_COUNT]))
+                posCluster.append((cid, nowCluster))
+        print "----------------database paraphrases----------------"
+        print dbParaList
+        print "-----------------positive clusters-----------------"
+        print posCluster
         return dbParaList, posCluster
 
 
@@ -196,9 +216,14 @@ def testInsertLabeledRes():
 
     PhraseUtils.insertLabeledRes(user, cluster_list)
 
+def testMatchHITs():
+    print "Test matching from nlp paraphrase to database paraphrase"
+    clusters = [89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103]
+    PhraseUtils.getMatchHIT(clusters)
 
 # Here is the test code
 if __name__ == "__main__":
     # PhraseUtils.cleanLabeledRes()
     # testInsertLabeledRes()
-    printSavedLabelRes()
+    # printSavedLabelRes()
+    testMatchHITs()

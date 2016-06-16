@@ -17,9 +17,10 @@ def getLabelPage(request):
         request.session["clusterCount"] = 0
         request.session["cluster"] = []
     if request.session["clusterCount"] >= CLUSTER_COUNT_EACH_TIME:
-        dbPara, nlpCluster = PhraseUtils.getMatchHIT(request.session["cluster"])
+        print request.session["cluster"]
+        dbParaList, nlpCluster = PhraseUtils.getMatchHIT(request.session["cluster"])
         res = {}
-        res["dbPara"] = dbPara
+        res["dbParaList"] = dbParaList
         res["nlpCluster"] = nlpCluster
         request.session["clusterCount"] = 0
         request.session["cluster"] = []
@@ -56,6 +57,6 @@ def saveLabeledRes(request):
         request.session["cluster"] = []
     request.session["cluster"] += posIdList
     request.session["clusterCount"] += 1
-    return HttpResponse("Success")
+    return HttpResponse("success")
 
 

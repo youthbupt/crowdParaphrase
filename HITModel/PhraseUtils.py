@@ -1,7 +1,7 @@
 #coding=utf8
 from MongoUtils import MongoUtils
 from model import ParaphraseCandidate, NLPParaphrase, HITClusterPositiveRes, \
-HITClusterNegativeRes, User, CandDBPhrase, DatabaseParaphrase
+HITClusterNegativeRes, User, CandDBPhrase, DatabaseParaphrase, HITMatchRes
 import random
 from datetime import datetime
 
@@ -136,6 +136,7 @@ class PhraseUtils():
 
     @staticmethod
     def getPosCluster(clusterId):
+        # print type(clusterId)
         clusters = HITClusterPositiveRes.objects(ID = clusterId)
         if len(clusters) > 0:
             return clusters[0]
@@ -173,15 +174,41 @@ class PhraseUtils():
                 # random.shuffle(nlpParaList)
                 # posCluster.append((cid, nlpParaList[:EACH_CLUSTER_SHOWN_COUNT]))
                 posCluster.append((cid, nowCluster))
+        """
         print "----------------database paraphrases----------------"
         print dbParaList
         print "-----------------positive clusters-----------------"
         print posCluster
+        """
         return dbParaList, posCluster
 
+    @staticmethod
+    def insertMatchRes(user, matchDict):
+        for dbId, posClusterList in matchDict.items():
+            # print "dbId:", dbId
+            dbId = int(dbId)
+            dbPara = PhraseUtils.getDBPhrase(dbId)
+            if dbPara is None:
+                continue
+            nlpCluster = []
+            for cluster in posClusterList:
+                # print "cluster:", cluster
+                nlpClusterId = int(cluster)
+                nlpClusterObj = PhraseUtils.getPosCluster(nlpClusterId)
+                if nlpClusterObj is None:
+                    continue
+                nlpCluster.append(nlpClusterObj)
+            if len(nlpCluster) < 1:
+                continue
+            print type(dbPara)
+            print type(nlpCluster)
+            matchRecord = HITMatchRes(ID = len(HITMatchRes.objects) + 1, user = user, \
+                dbPara = dbPara, clusterList = nlpCluster)
+            matchRecord.save()
 
     @staticmethod
     def cleanLabeledRes():
+        HITMatchRes.objects().delete()
         HITClusterPositiveRes.objects().delete()
         HITClusterNegativeRes.objects().delete()
 
@@ -221,9 +248,19 @@ def testMatchHITs():
     clusters = [89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103]
     PhraseUtils.getMatchHIT(clusters)
 
+def testSaveMatchRes():
+    for matchRecord in HITMatchRes.objects():
+        print "record id:", matchRecord.ID
+        print "user:", matchRecord.user.uname
+        print "database paraphrase:", matchRecord.dbPara.pname
+        print "----------cluster list----------"
+        for cluster in matchRecord.clusterList:
+            print cluster.ID,
+        print
+        print "-----------test end-----------"
 # Here is the test code
 if __name__ == "__main__":
     # PhraseUtils.cleanLabeledRes()
     # testInsertLabeledRes()
     # printSavedLabelRes()
-    testMatchHITs()
+    testSaveMatchRes()

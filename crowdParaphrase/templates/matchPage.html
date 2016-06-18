@@ -1,4 +1,5 @@
 {% load staticfiles %}
+{% load operationFilter %}
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -6,14 +7,26 @@
 <title>Label Page</title>
 <style>
 body{font-size:84%;}
-.dustbin{width:100px; height:260px; line-height:1.4; background-color:gray; font-size:36px; font-family:"微软雅黑", "Yahei Mono"; text-align:center; text-shadow:-1px -1px #bbb; float:left;}
-.dragbox{width:500px; padding-left:20px; float:left;}
+.dbDragBox{width:150px; height:220px; line-height:1.4; background-color:gray;font-size: 16px; font-family:"微软雅黑", "Yahei Mono"; text-align:center; text-shadow:-1px -1px #bbb; float:left; }
+
+.dbDraglist{padding:10px; margin-bottom:5px; border:2px dashed #ccc; background-color:#eee; cursor:move;}
+.dbDraglist:hover{border-color:#cad5eb; background-color:#f0f3f9;}
+.dbDragremind{padding-top:2em; clear:both;}
+.dbDraglist {
+    width: 130px;
+    height: 50px;
+    background: #ffffff;
+    -webkit-border-radius: 100px / 50px;
+    -moz-border-radius: 100px / 50px;
+    border-radius: 100px / 50px;
+    float: left;
+}
+
+.dragBox{width:700px; padding-left:20px; float:left;}
 .draglist{padding:10px; margin-bottom:5px; border:2px dashed #ccc; background-color:#eee; cursor:move;}
 .draglist:hover{border-color:#cad5eb; background-color:#f0f3f9;}
 .dragremind{padding-top:2em; clear:both;}
 .draglist {
-    width: 100px;
-    height: 50px;
     background: #ffffff;
     -webkit-border-radius: 100px / 50px;
     -moz-border-radius: 100px / 50px;
@@ -24,6 +37,29 @@ body{font-size:84%;}
 <script src="{% static "js/jquery.min.js" %}"></script>
 <link href="http://libs.baidu.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
 <script src="{% static "js/bootstrap.min.js" %}"></script>
+<script>
+  function submitMatchResult() {
+    json_res = JSON.stringify(matchDict)
+        $.ajax( {
+           type: "POST",
+           url: "/saveMatchRes",
+           data: {
+              matchRes: json_res,
+              csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value
+           },
+           success: function (data) {
+              if (data == "success")
+                 location.href = "/labelPage";
+              else {
+                 alert(data)
+              }
+           },
+           error: function(data) {
+              alert("Some http error happens!")
+           }
+        });
+  }
+</script>
 </head>
 
 <body>
@@ -60,38 +96,30 @@ body{font-size:84%;}
      </div>
   </nav>
   {% csrf_token %}
-  {% for dbPara in dbParaList %}
-  <div class="dbDragBox" dbId={{ dbPara.dbId }}>{{ dbPara.dbParaName }}</div>
-  {% endfor %}
+  <div class="dbDragBox">
+    {% for dbPara in dbParaList %}
+    <div class="dbDragList" dbId={{ dbPara.dbId }}>{{ dbPara.dbParaName }}</div>
+    {% endfor %}
+  </div>
   <div class="dragbox">
   {% for cid, cluster in nlpCluster %}
-    <div class="draglist" cid={{ cid }}>
+    <div class="draglist" cid={{ cid }} draggable="true" width={{ cluster|length|multiply:75 }}px>
       {% for nlpPara in cluster %}
         {{ nlpPara }}; <br>
       {% endfor %}
     </div>
   {% endfor %}
   </div>
-<!--div class="dragbox">
-  
-    {% for dbId, nlpId, pname in posCluster %}
-      <div class="draglist" clusterId = {{ forloop.counter0 }} dbId={{ dbId }} nlpId={{ nlpId }} draggable="true">{{ pname }}</div>
-    {% endfor %}
-</div-->
 <div class="dragremind"></div>
+<button type="button" class="btn btn-primary" onclick="submitMatchResult()">
+    submit
+</button>
 <script>
-  var eleDustbin = $(".dustbin")[0], eleDrags = $(".draglist")
+  var dbDraglist = $(".dbDraglist"), eleDrags = $(".draglist")
   lDrags = eleDrags.length
-  var clusterOnScreen = new Array(lDrags)
   eleRemind = $(".dragremind")[0]
   eleDrag = null;
-  for (var i=0; i<lDrags; i+=1) {
-    clusterId = parseInt(eleDrags[i].getAttribute("clusterId"))
-    nlpId = parseInt(eleDrags[i].getAttribute("nlpId"))
-    dbId = parseInt(eleDrags[i].getAttribute("dbId"))
-    clusterOnScreen[clusterId] = new Array()
-    clusterOnScreen[clusterId].push([nlpId, dbId])
-    
+  for (var i = 0; i < lDrags; i++) {    
     eleDrags[i].onselectstart = function() {
       return false;
     };
@@ -104,51 +132,62 @@ body{font-size:84%;}
     };
     eleDrags[i].ondrop = function(ev) {
       this.style.color = "#000000";
+      eleDrag = null
       return false;
     };
     eleDrags[i].ondragend = function(ev) {
       ev.dataTransfer.clearData("text");
       this.style.color = "#000000";
-      //eleDrag = null;
       return false
     };
-
-
+    eleDrags[i].ondragover = function(ev) {
+      ev.preventDefault();
+      return true;
+    };
+    eleDrags[i].ondragenter = function(ev) {
+      this.style.color = "#ffffff";
+      return true;
+    };
+    eleDrags[i].ondragleave = function(ev) {
+      this.style.color = "#000000";
+      ev.preventDefault();
+      return true;
+    };
   }
-for (var i = 0; i < lDrags; i += 1) {
-  eleDrags[i].ondragover = function(ev) {
-    //this.style.color = "#000000";
-    ev.preventDefault();
-    return true;
-  };
-  eleDrags[i].ondragenter = function(ev) {
-    this.style.color = "#ffffff";
-    return true;
-  };
-  eleDrags[i].ondragleave = function(ev) {
-    this.style.color = "#000000";
-    ev.preventDefault();
-    return true;
-  };
-}
-eleDustbin.ondragover = function(ev) {
-  ev.preventDefault();
 
-  return true;
-};
+  dbDragLen = dbDraglist.length
+  matchDict = {}
+  for (var i = 0; i < dbDragLen; i++) {
+    dbId = parseInt(dbDraglist[i].getAttribute("dbId"))
+    matchDict[dbId] = []
+    dbDraglist[i].ondrop = function(ev) {
+      if (eleDrag != null) {
+        className = eleDrag.getAttribute("class")
+        if (className == "draglist"){
+          this.style.color = "#000000";
+          cid = parseInt(eleDrag.getAttribute("cid"))
+          matchDict[dbId].push(cid)
+          eleDrag.parentNode.removeChild(eleDrag)
 
-eleDustbin.ondragenter = function(ev) {
-  this.style.color = "#ffffff";
-  return true;
-};
-eleDustbin.ondrop = function(ev) {
-  if (eleDrag) {
-    eleRemind.innerHTML = '<strong>Cluster:"' + eleDrag.innerHTML + '"</strong>合并完成';
-    eleDrag.parentNode.removeChild(eleDrag);
+        }
+        eleDrag = null
+      }
+      return false;
+    };
+    dbDraglist[i].ondragover = function(ev) {
+      ev.preventDefault();
+      return true;
+    };
+    dbDraglist[i].ondragenter = function(ev) {
+      this.style.color = "#ffffff";
+      return true;
+    };
+    dbDraglist[i].ondragleave = function(ev) {
+      this.style.color = "#000000";
+      ev.preventDefault();
+      return true;
+    };
   }
-  this.style.color = "#000000";
-  return false;
-};
 </script>
 </body>
 </html>

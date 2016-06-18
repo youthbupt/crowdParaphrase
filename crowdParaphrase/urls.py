@@ -21,6 +21,7 @@ urlpatterns = patterns('',
     url(r'^userLogin/?$', userLogin),
     url(r'^checkLogin/?$', checkLogin),
     url(r'^saveLabeledRes/?$', saveLabeledRes),
+    url(r'^saveMatchRes/?$', saveMatchRes),
     
     # url(r'^admin/', include(admin.site.urls)),
 )

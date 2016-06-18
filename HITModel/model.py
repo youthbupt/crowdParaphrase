@@ -59,5 +59,4 @@ class HITMatchRes(Document):
     ID = IntField(primary_key = True, min_value = 1)
     user = ReferenceField(User)
     dbPara = ReferenceField(DatabaseParaphrase)
-    cluster = ListField(EmbeddedDocumentField(MatchPair))
-    conf = DecimalField()
+    clusterList = ListField(ReferenceField(HITClusterPositiveRes))

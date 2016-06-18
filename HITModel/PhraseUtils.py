@@ -258,6 +258,7 @@ def testSaveMatchRes():
             print cluster.ID,
         print
         print "-----------test end-----------"
+
 # Here is the test code
 if __name__ == "__main__":
     # PhraseUtils.cleanLabeledRes()

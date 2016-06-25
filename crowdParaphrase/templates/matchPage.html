@@ -38,7 +38,9 @@ body{font-size:84%;}
 <link href="http://libs.baidu.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
 <script src="{% static "js/bootstrap.min.js" %}"></script>
 <script>
+  $(function () { $("[data-toggle='popover']").popover(); });
   function submitMatchResult() {
+    waitingDialog.show();
     json_res = JSON.stringify(matchDict)
         $.ajax( {
            type: "POST",
@@ -48,17 +50,82 @@ body{font-size:84%;}
               csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value
            },
            success: function (data) {
-              if (data == "success")
+              if (data == "success"){
+                 waitingDialog.hide();
                  location.href = "/labelPage";
+              }
               else {
                  alert(data)
+                 waitingDialog.hide();
               }
            },
            error: function(data) {
               alert("Some http error happens!")
+              waitingDialog.hide();
            }
         });
   }
+  var waitingDialog = waitingDialog || (function ($) {
+    'use strict';
+
+  // Creating modal dialog's DOM
+  var $dialog = $(
+    '<div class="modal fade" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true" style="padding-top:15%; overflow-y:visible;">' +
+    '<div class="modal-dialog modal-m">' +
+    '<div class="modal-content">' +
+      '<div class="modal-header"><h3 style="margin:0;"></h3></div>' +
+      '<div class="modal-body">' +
+        '<div class="progress progress-striped active" style="margin-bottom:0;"><div class="progress-bar" style="width: 100%"></div></div>' +
+      '</div>' +
+    '</div></div></div>');
+
+  return {
+    /**
+     * Opens our dialog
+     * @param message Custom message
+     * @param options Custom options:
+     *          options.dialogSize - bootstrap postfix for dialog size, e.g. "sm", "m";
+     *          options.progressType - bootstrap postfix for progress bar type, e.g. "success", "warning".
+     */
+    show: function (message, options) {
+      // Assigning defaults
+      if (typeof options === 'undefined') {
+        options = {};
+      }
+      if (typeof message === 'undefined') {
+        message = 'Loading';
+      }
+      var settings = $.extend({
+        dialogSize: 'm',
+        progressType: '',
+        onHide: null // This callback runs after the dialog was hidden
+      }, options);
+
+      // Configuring dialog
+      $dialog.find('.modal-dialog').attr('class', 'modal-dialog').addClass('modal-' + settings.dialogSize);
+      $dialog.find('.progress-bar').attr('class', 'progress-bar');
+      if (settings.progressType) {
+        $dialog.find('.progress-bar').addClass('progress-bar-' + settings.progressType);
+      }
+      $dialog.find('h3').text(message);
+      // Adding callbacks
+      if (typeof settings.onHide === 'function') {
+        $dialog.off('hidden.bs.modal').on('hidden.bs.modal', function (e) {
+          settings.onHide.call($dialog);
+        });
+      }
+      // Opening dialog
+      $dialog.modal();
+    },
+    /**
+     * Closes dialog
+     */
+    hide: function () {
+      $dialog.modal('hide');
+    }
+  };
+
+})(jQuery);
 </script>
 </head>
 
@@ -98,12 +165,12 @@ body{font-size:84%;}
   {% csrf_token %}
   <div class="dbDragBox">
     {% for dbPara in dbParaList %}
-    <div class="dbDragList" dbId={{ dbPara.dbId }}>{{ dbPara.dbParaName }}</div>
+    <div class="dbDragList" dbId={{ dbPara.dbId }} data-toggle="popover" title="Popover title" data-content="底部的 Popover 中的一些内容">{{ dbPara.dbParaName }}</div>
     {% endfor %}
   </div>
   <div class="dragbox">
   {% for cid, cluster in nlpCluster %}
-    <div class="draglist" cid={{ cid }} draggable="true" width={{ cluster|length|multiply:75 }}px>
+    <div class="draglist" cid={{ cid }} draggable="true" width={{ cluster|length|multiply:75 }}px data-toggle="popover" title="Popover title" data-content="底部的 Popover 中的一些内容">
       {% for nlpPara in cluster %}
         {{ nlpPara }}; <br>
       {% endfor %}
@@ -111,9 +178,7 @@ body{font-size:84%;}
   {% endfor %}
   </div>
 <div class="dragremind"></div>
-<button type="button" class="btn btn-primary" onclick="submitMatchResult()">
-    submit
-</button>
+<button type="button" class="btn btn-primary btn-lg " id="load" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Waiting" onclick="submitMatchResult()">Submit</button>
 <script>
   var dbDraglist = $(".dbDraglist"), eleDrags = $(".draglist")
   lDrags = eleDrags.length

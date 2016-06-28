@@ -259,6 +259,11 @@ def testSaveMatchRes():
         print
         print "-----------test end-----------"
 
+def clearAll():
+    MongoUtils.removeAllUsers()
+    MongoUtils.cleanAllPhrase()
+    PhraseUtils.cleanLabeledRes()
+
 # Here is the test code
 if __name__ == "__main__":
     # PhraseUtils.cleanLabeledRes()

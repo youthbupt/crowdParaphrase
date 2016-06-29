@@ -260,7 +260,7 @@ def testSaveMatchRes():
         print "-----------test end-----------"
 
 def clearAll():
-    MongoUtils.removeAllUsers()
+    # MongoUtils.removeAllUsers()
     MongoUtils.cleanAllPhrase()
     PhraseUtils.cleanLabeledRes()
 
@@ -269,4 +269,5 @@ if __name__ == "__main__":
     # PhraseUtils.cleanLabeledRes()
     # testInsertLabeledRes()
     # printSavedLabelRes()
-    testSaveMatchRes()
+    # testSaveMatchRes()
+    clearAll()

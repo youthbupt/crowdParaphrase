@@ -6,7 +6,7 @@ import sys
 try:
     from crowdParaPhrase.settings import DBNAME
 except:
-    DBNAME = "crowdParaHIT"
+    DBNAME = "crowdPara"
 
 connect(DBNAME)
 
@@ -49,14 +49,14 @@ class HITClusterPositiveRes(Document):
     ID = IntField(primary_key = True, min_value = 1)
     user = ReferenceField(User)
     dbPara = ListField(EmbeddedDocumentField(CandDBPhrase))
-    cluster = ListField(ReferenceField(NLPParaphrase))
+    cluster = ListField(ReferenceField(NLPPhraseCluster))
     date = DateTimeField()
 
 class HITClusterNegativeRes(Document):
     ID = IntField(primary_key = True, min_value = 1)
-    nlp_phrase = ReferenceField(NLPParaphrase)
+    nlp_phrase = ReferenceField(NLPPhraseCluster)
     user = ReferenceField(User)
-    cluster = ListField(ReferenceField(NLPParaphrase))
+    cluster = ListField(ReferenceField(NLPPhraseCluster))
     date = DateTimeField()
 
 class HITMatchRes(Document):

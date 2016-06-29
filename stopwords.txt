@@ -1,6 +1,9 @@
 a
 about
+among
 above
+also
+along
 after
 again
 against
@@ -15,12 +18,19 @@ as
 at
 be
 because
+become
+becomes
+became
 been
+twice
+second
 before
 being
 below
 between
 both
+begin
+began
 but
 by
 can't
@@ -41,6 +51,10 @@ few
 for
 from
 further
+first
+firstly
+get
+got
 had
 hadn't
 has
@@ -77,6 +91,7 @@ it's
 its
 itself
 let's
+later
 me
 more
 most
@@ -95,10 +110,12 @@ or
 other
 ought
 our
-ours	ourselves
+ours
+ourselves
 out
 over
 own
+s
 same
 shan't
 she

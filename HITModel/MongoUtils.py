@@ -1,6 +1,6 @@
 #coding=utf8
 from model import NLPParaphrase as nlpPhrase, DatabaseParaphrase as dbPhrase,\
-ParaphraseCandidate as paraCand, MatchPair as matchPair, User 
+ParaphraseCandidate as paraCand, MatchPair as matchPair, User, NLPPhraseCluster
 from mongoengine import *
 
 class MongoUtils():
@@ -51,7 +51,22 @@ class MongoUtils():
             return True, user_object
 
     @staticmethod
+    def insertNLPCluster(cluster):
+        nlpCluster = NLPPhraseCluster(ID = NLPPhraseCluster.objects.count() + 1, \
+            cluster = cluster)
+        nlpCluster.save()
+        return nlpCluster
+
+    @staticmethod
+    def insertPhraseCand(dbPhrase, candidates):
+        phraseCand = paraCand(ID = paraCand.objects.count() + 1, \
+            candidates = candidates)
+        phraseCand.save()
+        return phraseCand
+
+    @staticmethod
     def cleanAllPhrase():
+        NLPPhraseCluster.objects().delete()
         paraCand.objects().delete()
         nlpPhrase.objects().delete()
         dbPhrase.objects().delete()

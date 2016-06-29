@@ -25,10 +25,14 @@ class DatabaseParaphrase(Document):
     source = StringField(max_length = 15)
     pname = StringField(max_length = 50)
 
+class NLPPhraseCluster(Document):
+    ID = IntField(primary_key = True, min_value = 1)
+    cluster = ListField(ReferenceField(NLPParaphrase))
+
 class ParaphraseCandidate(Document):
     ID = IntField(primary_key = True, min_value = 1)
     DbpediaParaphrase = ReferenceField(DatabaseParaphrase)
-    candidates = ListField(EmbeddedDocumentField(MatchPair))
+    candidates = ListField(ReferenceField(NLPPhraseCluster))
 
 class User(Document):
     ID = IntField(primary_key = True, min_value = 1)

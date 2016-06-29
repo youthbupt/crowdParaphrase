@@ -60,7 +60,7 @@ class MongoUtils():
     @staticmethod
     def insertPhraseCand(dbPhrase, candidates):
         phraseCand = paraCand(ID = paraCand.objects.count() + 1, \
-            candidates = candidates)
+            dbPhrase = dbPhrase, candidates = candidates)
         phraseCand.save()
         return phraseCand
 

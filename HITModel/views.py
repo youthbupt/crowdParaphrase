@@ -43,8 +43,8 @@ def InsertToDatabase(source, path):
                 
         #insert database paraphrase's candidates
         for db_phrase, cand_list in dbCandSet.items():
-            print db_phrase
-            print cand_list
+            # print db_phrase
+            # print cand_list
             MongoUtils.insertCandidate(db_phrase, cand_list)
             
 def InsertFromFile(request = None):

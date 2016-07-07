@@ -1,7 +1,8 @@
 #coding=utf8
 from MongoUtils import MongoUtils
 from model import ParaphraseCandidate, NLPParaphrase, HITClusterPositiveRes, \
-HITClusterNegativeRes, User, CandDBPhrase, DatabaseParaphrase, HITMatchRes
+HITClusterNegativeRes, User, CandDBPhrase, DatabaseParaphrase, HITMatchRes, \
+NLPPhraseCluster
 import random
 from datetime import datetime
 
@@ -13,7 +14,7 @@ MAX_NLP_PHRASE = 30
 class PhraseUtils():
 
     @staticmethod
-    def getRandomHIT(prevList, MAX_DB_PHRASE = 5, MAX_NLP_CLUSTER = 10):
+    def getRandomHIT(prevList, MAX_DB_PHRASE = 5, MAX_NLP_PHRASE = 30):
         NLPPhraseCount = 0
         selectedDict = dict()
         cnt = 0
@@ -37,14 +38,14 @@ class PhraseUtils():
             selectedDict[nowCandId] = []
             candLen = len(nowCand.candidates)
             if NLPPhraseCount + candLen <= MAX_NLP_PHRASE:
-                for nlpCluster in nowCand.candidates:
-                    selectedDict[nowCandId].append(nlpCluster)
+                for nlp_phrase in nowCand.candidates:
+                    selectedDict[nowCandId].append(nlp_phrase)
                     #print nlp_phrase
                 NLPPhraseCount += candLen
             else:
                 cand = []
-                for nlpCluster in nowCand.candidates:
-                    cand.append(nlpCluster)
+                for nlp_phrase in nowCand.candidates:
+                    cand.append(nlp_phrase)
                 random.shuffle(cand)
                 i = 0
                 while NLPPhraseCount < MAX_NLP_PHRASE:
@@ -53,12 +54,9 @@ class PhraseUtils():
                     NLPPhraseCount += 1
             #print selectedDict[nowCandId]
         resList = []
-        for db_id, candClusterList in selectedDict.items():
-            for cluster in candClusterList:
-                nlpNameList = []
-                for nlpPhrase in cluster.cluster:
-                    nlpNameList.append(nlpPhrase.pname)
-                resList.append((db_id, cluster.ID, nlpNameList))
+        for db_id, cand_list in selectedDict.items():
+            for cand in cand_list:
+                resList.append((db_id, cand.NLPParaphrase.ID, cand.NLPParaphrase.pname))
         # print resList
         # print len(resList)
         return resList

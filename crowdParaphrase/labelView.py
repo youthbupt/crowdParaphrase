@@ -79,8 +79,9 @@ def getLabelPage(request):
         request.session["clusterCount"] = 0
         request.session["cluster"] = []
 
+    # print "hahahahaha", request.session["clusterCount"]
     if request.session["clusterCount"] >= CLUSTER_COUNT_EACH_TIME:
-        print request.session["cluster"]
+        # print request.session["cluster"]
         dbParaList, nlpCluster = PhraseUtils.getMatchHIT(request.session["cluster"])
         
         res["dbParaList"] = dbParaList
@@ -89,11 +90,13 @@ def getLabelPage(request):
         request.session["cluster"] = []
         return render(request, "matchPage.html", res)
     else:
+        
         if "labledPhrase" not in request.session:
             request.session["labledPhrase"] = []
 
         # res = getUserObject(request)
         randomHIT = PhraseUtils.getRandomHIT(request.session["labledPhrase"])
+        # print "123:", randomHIT
         res["phraseList"] = getCluster(randomHIT)
         print res["phraseList"]
         return render(request, "labelPage.html", res)

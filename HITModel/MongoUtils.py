@@ -1,6 +1,6 @@
 #coding=utf8
 from model import NLPParaphrase as nlpPhrase, DatabaseParaphrase as dbPhrase,\
-ParaphraseCandidate as paraCand, MatchPair as matchPair
+ParaphraseCandidate as paraCand, MatchPair as matchPair, NLPPhraseCluster
 from mongoengine import *
 
 class MongoUtils():
@@ -31,10 +31,15 @@ class MongoUtils():
     @staticmethod
     def insertCandidate(db, cand_list, confidence = 1.0):
         match_pairs = []
+        """
+        for cand in cand_list:
+            # print 233,
+            match_pairs.append(NLPParaphrase = cand)
+        """
         for cand in cand_list:
             # print 233,
             match_pairs.append(matchPair(NLPParaphrase = cand, confidence = confidence))
-        cand_object = paraCand(ID = paraCand.objects.count() + 1, DbpediaParaphrase = db, candidates = match_pairs)
+        cand_object = paraCand(ID = paraCand.objects.count() + 1, dbPhrase = db, candidates = match_pairs)
         cand_object.save()
 
 
@@ -78,3 +83,10 @@ class MongoUtils():
             now.value = i
             res.append(now)
         return res
+
+
+def test():
+    cleanAllPhrase()
+
+if __name__ == "__main__":
+    pass

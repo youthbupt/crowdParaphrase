@@ -32,7 +32,7 @@ class NLPPhraseCluster(Document):
 class ParaphraseCandidate(Document):
     ID = IntField(primary_key = True, min_value = 1)
     dbPhrase = ReferenceField(DatabaseParaphrase)
-    candidates = ListField(ReferenceField(NLPPhraseCluster))
+    candidates = ListField(EmbeddedDocumentField(MatchPair))
 
 class User(Document):
     ID = IntField(primary_key = True, min_value = 1)

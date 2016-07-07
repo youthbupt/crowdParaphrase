@@ -7,7 +7,7 @@ from HITModel.PhraseUtils import PhraseUtils
 CLUSTER_TASK_COUNT_EACH_TIME = 1
 
 
-def getLabelPage(request):
+def getLabelPageOld(request):
 
     #print request.session
     if "user" not in request.session:

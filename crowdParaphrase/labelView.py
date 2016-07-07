@@ -5,8 +5,67 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from userViews import getUserObject
 import json
+import re
 
 CLUSTER_COUNT_EACH_TIME = 1
+
+
+stopWordSet = set()
+
+def getStopWords():
+    with open("/media/coding/crowdParaphrase/stopwords.txt") as fin:
+        lines = re.split(r"[\r\n]", fin.read())
+        for l in lines:
+            if len(l) < 1:continue
+            stopWordSet.add(l.strip())
+getStopWords()
+
+
+def phraseFilter(s):
+    s = re.sub(r"\[\[\w*\]\]", " ", s).strip()
+    s = re.sub(r" {2,}", " ", s)
+    wordList = s.split(' ')
+    filteredWordList = []
+    for word in wordList:
+        if len(word) > 0 and word not in stopWordSet:
+            filteredWordList.append(word)
+    return " ".join(filteredWordList).strip()
+
+
+def isSame(s1, s2):
+    #print "before:", s1, "  &&  ", s2
+    s1 = phraseFilter(s1)
+    s2 = phraseFilter(s2)
+    """
+    if "involved" in s1 and "involved" in s2:
+        print s1, "@@@@@", s2
+    """
+    #print "after:", s1, "  &&  ", s2, " && ", s1 == s2
+    return s1 == s2
+
+def getCluster(randomHIT):
+    candDict = {}
+    for dbId, nlpId, nlpName in randomHIT:
+        if dbId not in candDict:
+            candDict[dbId] = []
+        hashFind = False
+        clen = len(candDict[dbId])
+        for i in xrange(clen):
+            if len(candDict[dbId][i]) > 5: continue
+            if isSame(nlpName, candDict[dbId][i][0][1]):
+                hashFind = True
+                candDict[dbId][i].append((nlpId, nlpName))
+                break
+        if not hashFind:
+            candDict[dbId].append([])
+            candDict[dbId][clen].append((nlpId, nlpName))
+    candRes = []
+    for db, candList in candDict.items():
+        for cand in candList:
+            candRes.append((db, cand))
+            if len(candRes) > 15: break
+    return candRes
+#def cluster()
 
 def getLabelPage(request):
 
@@ -14,6 +73,7 @@ def getLabelPage(request):
     if "user" not in request.session:
         return HttpResponse("Please log in first.")
     # res = {}
+
     res = getUserObject(request)
     if "clusterCount" not in request.session:
         request.session["clusterCount"] = 0
@@ -33,10 +93,10 @@ def getLabelPage(request):
             request.session["labledPhrase"] = []
 
         # res = getUserObject(request)
-        res["phraseList"] = PhraseUtils.getRandomHIT(request.session["labledPhrase"])
-    
+        randomHIT = PhraseUtils.getRandomHIT(request.session["labledPhrase"])
+        res["phraseList"] = getCluster(randomHIT)
+        print res["phraseList"]
         return render(request, "labelPage.html", res)
-
 
 def saveLabeledRes(request):
     user = None

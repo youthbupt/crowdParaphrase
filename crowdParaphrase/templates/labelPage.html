@@ -1,4 +1,6 @@
 {% load staticfiles %}
+{% load operationFilter %}
+
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -12,8 +14,6 @@ body{font-size:84%;}
 .draglist:hover{border-color:#cad5eb; background-color:#f0f3f9;}
 .dragremind{padding-top:2em; clear:both;}
 .draglist {
-    width: 150px;
-    height: 70px;
     background: #ffffff;
     -webkit-border-radius: 100px / 50px;
     -moz-border-radius: 100px / 50px;
@@ -159,8 +159,12 @@ body{font-size:84%;}
 	<div class="dustbin"><br />完<br />成</div>
 <div class="dragbox">
 	{% csrf_token %}
-    {% for dbId, nlpId, pname in phraseList %}
-    	<div class="draglist" clusterId = {{ forloop.counter0 }} dbId={{ dbId }} nlpId={{ nlpId }} draggable="true" data-toggle="popover" title="{{ pname }}" data-content="底部的 Popover 中的一些内容">{{ pname }}</div>
+    {% for dbId, nlpList in phraseList %}
+    	<div class="draglist" clusterId = {{ forloop.counter0 }} dbId={{ dbId }} nlpId={{ nlpList|catNLPID }} draggable="true">
+    	{% for db, nlp in nlpList %}
+    	{{ nlp }};<br>
+    	{% endfor%}
+    	</div>
     {% endfor %}
 </div>
 <div class="dragremind"></div>
@@ -194,14 +198,19 @@ body{font-size:84%;}
 	var eleDustbin = $(".dustbin")[0], eleDrags = $(".draglist")
 	lDrags = eleDrags.length
 	var clusterOnScreen = new Array(lDrags)
-	eleRemind = $(".dragremind")[0]
+	//eleRemind = $(".dragremind")[0]
 	eleDrag = null;
 	for (var i=0; i<lDrags; i+=1) {
 		clusterId = parseInt(eleDrags[i].getAttribute("clusterId"))
-		nlpId = parseInt(eleDrags[i].getAttribute("nlpId"))
-		dbId = parseInt(eleDrags[i].getAttribute("dbId"))
+		nlpIdList = eleDrags[i].getAttribute("nlpId").split(",")
 		clusterOnScreen[clusterId] = new Array()
-		clusterOnScreen[clusterId].push([nlpId, dbId])
+		dbId = parseInt(eleDrags[i].getAttribute("dbId"))
+		for (j = 0; j < nlpIdList.length; j++) {
+			nlpId = parseInt(nlpIdList[j])
+			clusterOnScreen[clusterId].push([nlpId, dbId])	
+		}
+		
+		
 		
 		eleDrags[i].onselectstart = function() {
 			return false;
@@ -216,15 +225,18 @@ body{font-size:84%;}
 		eleDrags[i].ondrop = function(ev) {
 			if (eleDrag != null && eleDrag != this) {
 
-				eleRemind.innerHTML = '<strong>合并了"' + this.innerHTML + '"和"' + eleDrag.innerHTML + '"</strong>';
+				//eleRemind.innerHTML = '<strong>合并了"' + this.innerHTML + '"和"' + eleDrag.innerHTML + '"</strong>';
 				/*
 				if (this.innerHTML.substr(0, 4) != "<br>")
 					this.innerHTML = "<br>" + this.innerHTML
 				*/
+				this.innerHTML += eleDrag.innerHTML
+				/*
 				if (eleDrag.innerHTML.substr(0, 4) != "<br>")
 					this.innerHTML += ';<br> ' + eleDrag.innerHTML
 				else
 					this.innerHTML += ';<br> ' + eleDrag.innerHTML.substr(4)
+				*/
 				id1 = parseInt(this.getAttribute("clusterId"))
 				id2 = parseInt(eleDrag.getAttribute("clusterId"))
 				
@@ -293,7 +305,7 @@ body{font-size:84%;}
 	};
 	eleDustbin.ondrop = function(ev) {
 		if (eleDrag) {
-			eleRemind.innerHTML = '<strong>Cluster:"' + eleDrag.innerHTML + '"</strong>合并完成';
+			//eleRemind.innerHTML = '<strong>Cluster:"' + eleDrag.innerHTML + '"</strong>合并完成';
 			eleDrag.parentNode.removeChild(eleDrag);
 		}
 		this.style.color = "#000000";

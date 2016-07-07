@@ -7,14 +7,12 @@
 <title>Label Page</title>
 <style>
 body{font-size:84%;}
-.dbDragBox{width:150px; height:220px; line-height:1.4; background-color:gray;font-size: 16px; font-family:"微软雅黑", "Yahei Mono"; text-align:center; text-shadow:-1px -1px #bbb; float:left; }
+.dbDragBox{line-height:1.4; background-color:gray;font-size: 16px; font-family:"微软雅黑", "Yahei Mono"; text-align:center; text-shadow:-1px -1px #bbb; float:left; }
 
 .dbDraglist{padding:10px; margin-bottom:5px; border:2px dashed #ccc; background-color:#eee; cursor:move;}
 .dbDraglist:hover{border-color:#cad5eb; background-color:#f0f3f9;}
 .dbDragremind{padding-top:2em; clear:both;}
 .dbDraglist {
-    width: 130px;
-    height: 50px;
     background: #ffffff;
     -webkit-border-radius: 100px / 50px;
     -moz-border-radius: 100px / 50px;
@@ -165,12 +163,12 @@ body{font-size:84%;}
   {% csrf_token %}
   <div class="dbDragBox">
     {% for dbPara in dbParaList %}
-    <div class="dbDragList" dbId={{ dbPara.dbId }} data-toggle="popover" title="Popover title" data-content="底部的 Popover 中的一些内容">{{ dbPara.dbParaName }}</div>
+    <div class="dbDragList" dbId={{ dbPara.dbId }} data-toggle="popover" title="{{ dbPara.dbParaName }}" data-content="Some example is here!">{{ dbPara.dbParaName }}</div>
     {% endfor %}
   </div>
   <div class="dragbox">
   {% for cid, cluster in nlpCluster %}
-    <div class="draglist" cid={{ cid }} draggable="true" width={{ cluster|length|multiply:75 }}px data-toggle="popover" title="Popover title" data-content="底部的 Popover 中的一些内容">
+    <div class="draglist" cid={{ cid }} draggable="true">
       {% for nlpPara in cluster %}
         {{ nlpPara }}; <br>
       {% endfor %}

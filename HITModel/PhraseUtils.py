@@ -12,13 +12,16 @@ candPairLen = len(ParaphraseCandidate.objects)
 class PhraseUtils():
 
     @staticmethod
-    def getRandomHIT(prevList, MAX_DB_PHRASE = 5, MAX_NLP_PHRASE = 20):
+    def getRandomHIT(prevList, MAX_DB_PHRASE = 5, MAX_NLP_PHRASE = 30):
         NLPPhraseCount = 0
         selectedDict = dict()
-        
+        cnt = 0
         while (NLPPhraseCount < MAX_NLP_PHRASE):
             if len(selectedDict) == candPairLen:
                 break
+            if cnt > 10: break
+            cnt += 1
+            print cnt
             nowCandId = random.randint(0, candPairLen)
             if nowCandId in selectedDict or nowCandId in prevList:
                 continue
@@ -214,7 +217,7 @@ class PhraseUtils():
 
 def testGetRandomHIT():
     preSet = set()
-    res = PhraseUtils.getRandomHIT(preSet)
+    res = PhraseUtils.getRandomHIT([])
     print res
 
 def printSavedLabelRes():
@@ -269,4 +272,5 @@ if __name__ == "__main__":
     # PhraseUtils.cleanLabeledRes()
     # testInsertLabeledRes()
     # printSavedLabelRes()
-    testSaveMatchRes()
+    # testSaveMatchRes()
+    testGetRandomHIT()

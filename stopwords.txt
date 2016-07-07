@@ -22,11 +22,15 @@ become
 becomes
 became
 been
+twice
+second
 before
 being
 below
 between
 both
+begin
+began
 but
 by
 can't

@@ -29,7 +29,6 @@ def InsertToDatabase(source, path):
                 dbPhraseSet.add(db_phrase)
 
                 # if this database paraphrase is not in Mongodb yet, generate the candidates
-
             # insert nlp paraphrase to Mongodb
             if nlp_phrase not in nlpPhraseSet:
                 flag, nlp_object = MongoUtils.getAndSetNLPPhrase(nlp_phrase)

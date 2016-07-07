@@ -7,32 +7,101 @@
    <script src="{% static "js/jquery.min.js" %}"></script>
 
    <script src="{% static "js/bootstrap.min.js" %}"></script>
-
+   <script type="text/javascript" src="{% static "js/md5.js" %}"></script>
 </head>
 <script>
-   
+
+  $('#signup-button').click(function(){
+    $('#signin-li').removeClass('active');
+    $('#signin-tab').removeClass('active');
+    $('#signup-li').addClass('active');
+    $('#signup-tab').addClass('active');
+  });
+  $('#signin-button').click(function(){
+    $('#signup-li').removeClass('active');
+    $('#signup-tab').removeClass('active');
+    $('#signin-li').addClass('active');
+    $('#signin-tab').addClass('active');
+  });
+
+   function registerShow() {
+    $('#signup-li').removeClass('active');
+    $('#signup-tab').removeClass('active');
+    $('#signin-li').addClass('active');
+    $('#signin-tab').addClass('active');
+    $('#signin-signup-tab').modal('show')
+   }
+   function loginShow() {
+    $('#signup-li').removeClass('active');
+    $('#signup-tab').removeClass('active');
+    $('#signin-li').addClass('active');
+    $('#signin-tab').addClass('active');
+    $('#signin-signup-tab').modal('show')
+   }
+   function showAlertOnLogModal(msg) {
+      $("#loginWarningBox")[0].innerHTML = '<div class="alert alert-warning"><a class="close" data-dismiss="alert">&times;</a><strong>' + msg + '</strong></div>'
+   }
+
+    function showAlertOnHomePage(msg) {
+      $("#homeWarningBox")[0].innerHTML = '<div class="alert alert-warning"><a class="close" data-dismiss="alert">&times;</a><strong>' + msg + '</strong></div>'
+    }
+
    function login(){
-      //alert($("#username").val())
-      $.ajax( {
-         type: "GET",
-         url: "userLogin",
-         data: {
-            "user": $("#username").val(),
-            csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value
-         },
-         success: function (data) {
-            if (data == "success")
-               location.href = "labelPage/";
-            else {
-               alert(data)
-            }
-         },
-         error: function(data) {
-            alert("Login failed, please check your username!")
-         }
-      });
+    $.ajax( {
+      type: "POST",
+      url: "userLogin",
+      data: {
+        "user": $("#logUser").val(),
+        "password" : hex_md5($("#logPassword").val()),
+        csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value
+      },
+      success: function (data) {
+        if (data == "success")
+          location.href = "labelPage/";
+        else {
+          showAlertOnLogModal(data)
+        }
+      },
+      error: function(data) {
+        showAlertOnLogModal("Login failed, please check your username and password!")
+      }
+    });
 
    }
+
+   function register() {
+    password = $("#password1").val()
+    password2 = $("#password2").val()
+    if (password.length < 5) {
+      showAlertOnLogModal("Password should be longer than 6 charactors!")
+      return
+    }
+    if (password != password2) {
+      showAlertOnLogModal("The two password you input are different!")
+      return
+    }
+    $.ajax( {
+      type: "POST",
+      url: "userRegister",
+      data: {
+        "user": $("#regUser").val(),
+        "email": $("#regMail").val(),
+        "password" : hex_md5(password),
+        csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value
+      },
+      success: function (data) {
+        if (data == "success")
+          location.href = "labelPage/";
+        else {
+          showAlertOnLogModal(data)
+        }
+      },
+      error: function(data) {
+        showAlertOnLogModal("Login failed, please check your username and password!")
+      }
+    });
+   }
+
    function checkLogin() {
       
       $.ajax( {
@@ -44,18 +113,15 @@
          success: function (data) {
             if (data == "success")
                location.href = "labelPage/";
-            else if (data == "User is already login"){
-               alert(data)
-               location.href = ""
+            else if (data == "Incorrect password"){
+               alert("Incorrect password, Please try again")
             }
             else {
-               alert("You have not login yet, please login first!")
-               $('#myModal').modal('show')
+               showAlertOnHomePage("You have not login yet, please login first!")
             } 
          },
          error: function() {
-            alert("You have not login yet, please login first!")
-            $('#myModal').modal('show')
+            showAlertOnHomePage("You have not login yet, please login first!")
          }
       });
 
@@ -73,12 +139,12 @@
             if (data == "success")
                location.href = "";
             else {
-               $('#myModal').modal('show')
+               loginShow()
             } 
          },
          error: function() {
             alert("You have not login yet, please login first!")
-            $('#myModal').modal('show')
+            loginShow()
          }
       });
 
@@ -105,7 +171,7 @@
    }
 </script>
 <body>
-
+{% csrf_token %}
 <nav class="navbar navbar-default" role="navigation">
    <div class="navbar-header">
       <a class="navbar-brand" href="#">Paraphrase Dictionary</a>
@@ -138,40 +204,78 @@
       </ul>
    </div>
 </nav>
+
+<div id="homeWarningBox"></div>
+
 <h2>Are you ready?</h2>
 <!-- 按钮触发模态框 -->
 <button class="btn btn-primary btn-lg" onclick="checkLogin()">
    Yes!
 </button>
 
-<!-- 模态框（Modal） -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" 
-   aria-labelledby="myModalLabel" aria-hidden="true">
-   {% csrf_token %}
-   <div class="modal-dialog">
-      <div class="modal-content">
-         <div class="modal-header">
-            <button type="button" class="close" 
-               data-dismiss="modal" aria-hidden="true">
-                  &times;
-            </button>
-            <h4 class="modal-title" id="myModalLabel">
-               Please enter your name!
-            </h4>
-         </div>
-         <div class="modal-body">
-            <input type="text" id="username">
-         </div>
-         <div class="modal-footer">
-            <button type="button" class="btn btn-default" 
-               data-dismiss="modal">关闭
-            </button>
-            <button type="button" class="btn btn-primary" onclick="login()">
-               提交
-            </button>
-         </div>
-      </div><!-- /.modal-content -->
-</div><!-- /.modal -->
-</div>
+
+    <div id="signin-signup-tab" class="modal fade">
+      <div class="modal-dialog">
+      
+            
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <br>
+            <ul class="nav nav-tabs" role="tablist">
+              <li id="signin-li"><a href="#signin-tab" role="tab" data-toggle="tab">Sig in</a></li>
+              <li id="signup-li"><a href="#signup-tab" role="tab" data-toggle="tab">Sig up</a></li>
+            </ul>
+            <div id="loginWarningBox"></div>
+
+          </div>
+          <div class="modal-body">
+            <div class="tab-content" id="signin-signup-tab">
+              <div class="tab-pane" id="signup-tab">
+                <form class="form col-md-12 center-block">
+                  <div class="form-group">
+                    <input id="regMail" type="text" class="form-control input-lg" placeholder="your email here...">
+                  </div>
+                  <div class="form-group">
+                    <input id="regUser" type="text" class="form-control input-lg" placeholder="your username here...">
+                  </div>
+                  <div class="form-group">
+                    <input id="password1" type="password" class="form-control input-lg" placeholder="your password">
+                  </div>
+                  <div class="form-group">
+                    <input id="password2" type="password" class="form-control input-lg" placeholder="twice input your password">
+                  </div>
+                  <div class="form-group">
+                    <button class="btn btn-primary btn-lg btn-block" onclick="register()">Sig up</button>
+                  </div>
+                </form>
+              </div>
+              <div class="tab-pane" id="signin-tab">
+                <form action="" class="form col-md-12 center-block">
+                  <div class="form-group">
+                    <input type="text" id="logUser" class="form-control input-lg" placeholder="username">
+                  </div>
+                  <div class="form-group">
+                    <input type="password" id="logPassword" class="form-control input-lg" placeholder="password">
+                  </div>
+                  <div class="form-group">
+                    <button class="btn btn-primary btn-lg btn-block" onclick="login()">Sig in</button>
+                    <span><a href="">Forget your password?</a></span>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert-block hide" id="warning-block">
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+      <h4>Warning!</h4><p id="warningMSG">Best check yo self, you're not...</p>
+    </div>
+
 </body>
 </html>

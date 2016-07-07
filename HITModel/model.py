@@ -6,7 +6,7 @@ import sys
 try:
     from crowdParaPhrase.settings import DBNAME
 except:
-    DBNAME = "crowdParaHIT"
+    DBNAME = "crowdPara"
 
 connect(DBNAME)
 
@@ -25,14 +25,20 @@ class DatabaseParaphrase(Document):
     source = StringField(max_length = 15)
     pname = StringField(max_length = 50)
 
+class NLPPhraseCluster(Document):
+    ID = IntField(primary_key = True, min_value = 1)
+    cluster = ListField(ReferenceField(NLPParaphrase))
+
 class ParaphraseCandidate(Document):
     ID = IntField(primary_key = True, min_value = 1)
-    DbpediaParaphrase = ReferenceField(DatabaseParaphrase)
-    candidates = ListField(EmbeddedDocumentField(MatchPair))
+    dbPhrase = ReferenceField(DatabaseParaphrase)
+    candidates = ListField(ReferenceField(NLPPhraseCluster))
 
 class User(Document):
     ID = IntField(primary_key = True, min_value = 1)
     uname = StringField(max_length = 100)
+    mail = EmailField()
+    password = StringField(max_length = 100)
     confidence = FloatField()
     level = IntField()
     taskCount = IntField()
@@ -45,14 +51,14 @@ class HITClusterPositiveRes(Document):
     ID = IntField(primary_key = True, min_value = 1)
     user = ReferenceField(User)
     dbPara = ListField(EmbeddedDocumentField(CandDBPhrase))
-    cluster = ListField(ReferenceField(NLPParaphrase))
+    cluster = ListField(ReferenceField(NLPPhraseCluster))
     date = DateTimeField()
 
 class HITClusterNegativeRes(Document):
     ID = IntField(primary_key = True, min_value = 1)
-    nlp_phrase = ReferenceField(NLPParaphrase)
+    nlp_phrase = ReferenceField(NLPPhraseCluster)
     user = ReferenceField(User)
-    cluster = ListField(ReferenceField(NLPParaphrase))
+    cluster = ListField(ReferenceField(NLPPhraseCluster))
     date = DateTimeField()
 
 class HITMatchRes(Document):

@@ -75,6 +75,7 @@ def getLabelPage(request):
     # res = {}
 
     res = getUserObject(request)
+    print res
     if "clusterCount" not in request.session:
         request.session["clusterCount"] = 0
         request.session["cluster"] = []

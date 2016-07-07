@@ -36,4 +36,7 @@ def getLabelPageOld(request):
         return render(request, "labelPage.html", res)
 
 def getHomePage(request):
-    return render(request, "home.html")
+
+    res = getUserObject(request)
+    print res
+    return render(request, "home.html", res)

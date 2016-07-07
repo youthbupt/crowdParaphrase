@@ -36,6 +36,7 @@ def getUserObject(request):
 
 
 def checkLogin(request):
+    # print request.session["user"]
     if "user" in request.session:
         return HttpResponse("success")
     else:

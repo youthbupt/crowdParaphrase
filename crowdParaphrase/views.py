@@ -1,6 +1,11 @@
 #coding=utf8
 from django.shortcuts import render
 from django.http import HttpResponse, Http404
+from userViews import getUserObject
+from HITModel.PhraseUtils import PhraseUtils
+
+CLUSTER_TASK_COUNT_EACH_TIME = 1
+
 
 def getLabelPage(request):
 
@@ -13,7 +18,7 @@ def getLabelPage(request):
         request.session["clusterCount"] = 0
         request.session["cluster"] = []
 
-    if request.session["clusterCount"] >= CLUSTER_COUNT_EACH_TIME:
+    if request.session["clusterCount"] >= CLUSTER_TASK_COUNT_EACH_TIME:
         print request.session["cluster"]
         dbParaList, nlpCluster = PhraseUtils.getMatchHIT(request.session["cluster"])
         

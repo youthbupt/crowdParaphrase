@@ -85,19 +85,19 @@
       url: "userRegister",
       data: {
         "user": $("#regUser").val(),
-        "email": $("#regMail").val(),
+        "mail": $("#regMail").val(),
         "password" : hex_md5(password),
         csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value
       },
       success: function (data) {
         if (data == "success")
-          location.href = "labelPage/";
+          location.href = "/";
         else {
           showAlertOnLogModal(data)
         }
       },
       error: function(data) {
-        showAlertOnLogModal("Login failed, please check your username and password!")
+        showAlertOnLogModal("Register failed, please check your username and password!")
       }
     });
    }
@@ -227,7 +227,6 @@
               <li id="signup-li"><a href="#signup-tab" role="tab" data-toggle="tab">Sig up</a></li>
             </ul>
             <div id="loginWarningBox"></div>
-
           </div>
           <div class="modal-body">
             <div class="tab-content" id="signin-signup-tab">

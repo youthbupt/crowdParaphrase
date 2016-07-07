@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, Http404
 from HITModel.MongoUtils import MongoUtils
 from HITModel.UserUtils import UserUtils
+import re
 
 def getLabelPageTest(request):
     print request.session
@@ -21,7 +22,7 @@ def userLogout(request):
 def getUserObject(request):
     user = None
     if "user" in request.session:
-        user = MongoUtils.getUser(request.session["user"])
+        user = UserUtils.getUser(request.session["user"])
     res = {}
     if user is not None:
         res['hasLogin'] = True
@@ -67,7 +68,7 @@ def userLogin(request):
         if flag == 2:
             return HttpResponse("password is incorrect!")
 
-def userRegister(username):
+def userRegister(request):
     if request.method == "POST":
         username = request.POST.get("user", None)
         password = request.POST.get("password", None)
@@ -76,7 +77,29 @@ def userRegister(username):
         username = request.GET.get("user", None)
         password = request.GET.get("password", None)
         mail = request.POST.get("mail", None)
-    flag, userObject = MongoUtils.userRegister(username)
-    return flag
+
+    if username is None:
+        return HttpResponse("User name cannot be null")
+    if password is None:
+        return HttpResponse("Password cannot be null")
+    if mail is None:
+        return HttpResponse("Email address cannot be null")
+    if len(username) < 5:
+        return HttpResponse("User name must be longer than 5 charactors!")
+    if len(username) >= 20:
+        return HttpResponse("User name must be less than 20 charactors!")
+    res = re.match(r'^(\w)+(\.\w+)*@(\w)+((\.\w+)+)$', mail)
+    if res is None:
+        return HttpResponse("Please input a valid email address!")
+    
+    resState = UserUtils.userRegister(username, password, mail)
+    if resState == 1:
+        request.session["user"] = username
+        return HttpResponse("success")
+
+    if resState == 2:
+        return HttpResponse("User name already exists!")
+
+    return HttpResponse("Register failed! Please try again")
 
 

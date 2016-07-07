@@ -7,6 +7,7 @@ from datetime import datetime
 
 # global parameters
 candPairLen = len(ParaphraseCandidate.objects)
+MAX_NLP_PHRASE = 30
 # print "length of paraphrase candidates list: %d" % candPairLen
 
 class PhraseUtils():

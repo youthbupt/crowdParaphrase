@@ -40,7 +40,22 @@ class MongoUtils():
 
 
     @staticmethod
+    def insertNLPCluster(cluster):
+        nlpCluster = NLPPhraseCluster(ID = NLPPhraseCluster.objects.count() + 1, \
+            cluster = cluster)
+        nlpCluster.save()
+        return nlpCluster
+
+    @staticmethod
+    def insertPhraseCand(dbPhrase, candidates):
+        phraseCand = paraCand(ID = paraCand.objects.count() + 1, \
+            dbPhrase = dbPhrase, candidates = candidates)
+        phraseCand.save()
+        return phraseCand
+
+    @staticmethod
     def cleanAllPhrase():
+        NLPPhraseCluster.objects().delete()
         paraCand.objects().delete()
         nlpPhrase.objects().delete()
         dbPhrase.objects().delete()

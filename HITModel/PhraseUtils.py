@@ -12,13 +12,19 @@ candPairLen = len(ParaphraseCandidate.objects)
 class PhraseUtils():
 
     @staticmethod
-    def getRandomHIT(prevList, MAX_DB_PHRASE = 5, MAX_NLP_PHRASE = 20):
+    def getRandomHIT(prevList, MAX_DB_PHRASE = 5, MAX_NLP_CLUSTER = 10):
         NLPPhraseCount = 0
         selectedDict = dict()
-        
+        if len(prevList) > len(candPairLen) / 2:
+            prevList = []
+        cnt = 0
         while (NLPPhraseCount < MAX_NLP_PHRASE):
             if len(selectedDict) == candPairLen:
                 break
+            cnt += 1
+            if cnt > 500:
+                break
+
             nowCandId = random.randint(0, candPairLen)
             if nowCandId in selectedDict or nowCandId in prevList:
                 continue
@@ -33,14 +39,14 @@ class PhraseUtils():
             selectedDict[nowCandId] = []
             candLen = len(nowCand.candidates)
             if NLPPhraseCount + candLen <= MAX_NLP_PHRASE:
-                for nlp_phrase in nowCand.candidates:
-                    selectedDict[nowCandId].append(nlp_phrase)
+                for nlpCluster in nowCand.candidates:
+                    selectedDict[nowCandId].append(nlpCluster)
                     #print nlp_phrase
                 NLPPhraseCount += candLen
             else:
                 cand = []
-                for nlp_phrase in nowCand.candidates:
-                    cand.append(nlp_phrase)
+                for nlpCluster in nowCand.candidates:
+                    cand.append(nlpCluster)
                 random.shuffle(cand)
                 i = 0
                 while NLPPhraseCount < MAX_NLP_PHRASE:
@@ -49,9 +55,12 @@ class PhraseUtils():
                     NLPPhraseCount += 1
             #print selectedDict[nowCandId]
         resList = []
-        for db_id, cand_list in selectedDict.items():
-            for cand in cand_list:
-                resList.append((db_id, cand.NLPParaphrase.ID, cand.NLPParaphrase.pname))
+        for db_id, candClusterList in selectedDict.items():
+            for cluster in candClusterList:
+                nlpNameList = []
+                for nlpPhrase in cluster.cluster:
+                    nlpNameList.append(nlpPhrase.pname)
+                resList.append((db_id, cluster.ID, nlpNameList))
         # print resList
         # print len(resList)
         return resList
@@ -259,9 +268,15 @@ def testSaveMatchRes():
         print
         print "-----------test end-----------"
 
+def clearAll():
+    # MongoUtils.removeAllUsers()
+    MongoUtils.cleanAllPhrase()
+    PhraseUtils.cleanLabeledRes()
+
 # Here is the test code
 if __name__ == "__main__":
     # PhraseUtils.cleanLabeledRes()
     # testInsertLabeledRes()
     # printSavedLabelRes()
-    testSaveMatchRes()
+    # testSaveMatchRes()
+    clearAll()

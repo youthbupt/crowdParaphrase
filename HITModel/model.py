@@ -33,6 +33,8 @@ class ParaphraseCandidate(Document):
 class User(Document):
     ID = IntField(primary_key = True, min_value = 1)
     uname = StringField(max_length = 100)
+    mail = EmailField()
+    password = StringField(max_length = 100)
     confidence = FloatField()
     level = IntField()
     taskCount = IntField()

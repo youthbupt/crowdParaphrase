@@ -1,6 +1,6 @@
 #coding=utf8
 from model import NLPParaphrase as nlpPhrase, DatabaseParaphrase as dbPhrase,\
-ParaphraseCandidate as paraCand, MatchPair as matchPair, User 
+ParaphraseCandidate as paraCand, MatchPair as matchPair
 from mongoengine import *
 
 class MongoUtils():
@@ -37,18 +37,7 @@ class MongoUtils():
         cand_object = paraCand(ID = paraCand.objects.count() + 1, DbpediaParaphrase = db, candidates = match_pairs)
         cand_object.save()
 
-    @staticmethod
-    def userRegister(username):
-        print "%s tries to login or register" % username
-        user_object = User.objects(uname = username)
-        if len(user_object) == 0:
-            user_object = User(ID = User.objects.count() + 1, uname = username, confidence = 0.0, level = 0, taskCount = 0)
-            user_object.save()
-            print "A new user %s has just registered" % username
-            return False, user_object
-        else:
-            print "User %s has logged in" % username
-            return True, user_object
+
 
     @staticmethod
     def cleanAllPhrase():
@@ -56,17 +45,6 @@ class MongoUtils():
         nlpPhrase.objects().delete()
         dbPhrase.objects().delete()
 
-    @staticmethod
-    def removeAllUsers():
-        User.objects().delete()
-
-
-    @staticmethod
-    def getUser(username):
-        user_object = User.objects(uname = username)
-        if len(user_object) == 0:
-            return None
-        return user_object[0]
 
     @staticmethod
     def transInt2IntField(intArr):

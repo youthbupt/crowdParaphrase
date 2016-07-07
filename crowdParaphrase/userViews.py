@@ -2,6 +2,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse, Http404
 from HITModel.MongoUtils import MongoUtils
+from HITModel.UserUtils import UserUtils
 
 def getLabelPageTest(request):
     print request.session
@@ -32,9 +33,6 @@ def getUserObject(request):
         res['hasLogin'] = False
     return res
 
-def getHomePage(request):
-    res = getUserObject(request)
-    return render(request, "home.html", res)
 
 def checkLogin(request):
     if "user" in request.session:
@@ -49,20 +47,35 @@ def userLogin(request):
     else:
         if request.method == "POST":
             username = request.POST.get("user", None)
+            password = request.POST.get("password", None)
         else:
             username = request.GET.get("user", None)
+            password = request.GET.get("password", None)
 
         if username == None:
             return HttpResponse("Username cannot be none!")
         username = username.strip()
         if len(username) < 1 or username.find(' ') != -1:
             return HttpResponse("Illegal username!")
-        else:
-            flag = userRegister(username)
+        flag = UserUtils.userLogin(username, password)
+        if flag == 1:
             request.session["user"] = username
             return HttpResponse("success")
+        if flag == 0:
+            return HttpResponse("no such user!")
+        
+        if flag == 2:
+            return HttpResponse("password is incorrect!")
 
 def userRegister(username):
+    if request.method == "POST":
+        username = request.POST.get("user", None)
+        password = request.POST.get("password", None)
+        mail = request.POST.get("mail", None)
+    else:
+        username = request.GET.get("user", None)
+        password = request.GET.get("password", None)
+        mail = request.POST.get("mail", None)
     flag, userObject = MongoUtils.userRegister(username)
     return flag
 

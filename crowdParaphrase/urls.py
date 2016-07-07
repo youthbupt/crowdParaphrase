@@ -2,6 +2,7 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from userViews import *
 from labelView import *
+from views import *
 from HITModel.views import *
 import sys
 
@@ -19,6 +20,7 @@ urlpatterns = patterns('',
     url(r'^$', getHomePage),
     url(r'^userLogout/?$', userLogout),
     url(r'^userLogin/?$', userLogin),
+    url(r'^userRegister/?$', userRegister),
     url(r'^checkLogin/?$', checkLogin),
     url(r'^saveLabeledRes/?$', saveLabeledRes),
     url(r'^saveMatchRes/?$', saveMatchRes),

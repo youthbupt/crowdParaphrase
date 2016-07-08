@@ -100,7 +100,7 @@ def InsertQALDPhrase(source, path):
                     if MAX_DB_PHRASE > 0 and len(dbPhraseSet) >= MAX_DB_PHRASE:
                         break
 
-                print 'Have inserted database phrase "%s":' % db_phrase
+                print 'Have inserted database phrase: "%s"' % db_phrase
                 dbPhraseSet.add(db_phrase)
 
                 # if this database paraphrase is not in Mongodb yet, generate the candidates
@@ -122,6 +122,7 @@ def InsertQALDPhrase(source, path):
             # print db_phrase
             # print cand_list
             MongoUtils.insertCandidate(db_phrase, cand_list)
+    print "Have insered all QALD phrase to database, %d dbpedia phrases in all" % len(dbPhraseSet)
 
 
 def InsertFromFile(request = None):
@@ -152,6 +153,7 @@ def removeAllUsers(request = None):
 
 
 def InsertQALDPhraseFromFile():
+    cleanParaphraseDatabase()
     fileInfo = [("dbpedia", "/media/database/patty-dataset/dbpedia-relation-paraphrases.txt")]
     for (source, path) in fileInfo:
         InsertQALDPhrase(source, path)

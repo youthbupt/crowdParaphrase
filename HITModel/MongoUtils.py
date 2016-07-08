@@ -16,6 +16,24 @@ class MongoUtils():
             flag = False
         return flag, db_object
 
+
+    @staticmethod
+    def getAndSetDBPhraseWithExample(source, db_phrase, subj, obj):
+        if subj is None or obj is None:
+            print "You must offer an example of this phrase, \
+            or you can call getAndSetDBPhrase function"
+            return
+        db_objects = dbPhrase.objects(source = source, pname = db_phrase)
+        if len(db_objects) > 0:
+            db_object = db_objects[0]
+            flag = True
+        else:
+            db_object = dbPhrase(ID = dbPhrase.objects.count() + 1, source = source, pname = db_phrase,\
+                subjectExample = subj, objectExample = obj)
+            db_object.save()
+            flag = False
+        return flag, db_object
+
     @staticmethod
     def getAndSetNLPPhrase(nlp_phrase):
         nlp_objects = nlpPhrase.objects(pname = nlp_phrase)

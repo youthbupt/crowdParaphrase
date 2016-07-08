@@ -1,6 +1,7 @@
 #coding=utf8
 from HITModel.PhraseUtils import PhraseUtils
 from HITModel.MongoUtils import MongoUtils
+from HITModel.UserUtils import UserUtils
 from django.http import HttpResponse
 from django.shortcuts import render
 from userViews import getUserObject
@@ -13,7 +14,7 @@ CLUSTER_COUNT_EACH_TIME = 1
 stopWordSet = set()
 
 def getStopWords():
-    with open("/media/coding/crowdParaphrase/stopwords.txt") as fin:
+    with open("stopwords.txt") as fin:
         lines = re.split(r"[\r\n]", fin.read())
         for l in lines:
             if len(l) < 1:continue
@@ -87,8 +88,8 @@ def getLabelPage(request):
         
         res["dbParaList"] = dbParaList
         res["nlpCluster"] = nlpCluster
-        request.session["clusterCount"] = 0
-        request.session["cluster"] = []
+        # request.session["clusterCount"] = 0
+        # request.session["cluster"] = []
         return render(request, "matchPage.html", res)
     else:
         
@@ -107,7 +108,7 @@ def saveLabeledRes(request):
     if "user" not in request.session:
         return HttpResponse("Please log in first.")
 
-    user = MongoUtils.getUser(request.session["user"])
+    user = UserUtils.getUser(request.session["user"])
     if user == None:
         return HttpResponse("No such user!")
     labeledRes = None
@@ -130,7 +131,7 @@ def saveMatchRes(request):
     user = None
     if "user" not in request.session:
         return HttpResponse("Please log in first.")
-    user = MongoUtils.getUser(request.session["user"])
+    user = UserUtils.getUser(request.session["user"])
     if user == None:
         return HttpResponse("No such user!")
     if request.method == "POST":

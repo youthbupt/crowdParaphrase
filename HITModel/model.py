@@ -54,14 +54,14 @@ class HITClusterPositiveRes(Document):
     ID = IntField(primary_key = True, min_value = 1)
     user = ReferenceField(User)
     dbPara = ListField(EmbeddedDocumentField(CandDBPhrase))
-    cluster = ListField(ReferenceField(NLPPhraseCluster))
+    cluster = ListField(ReferenceField(NLPParaphrase))
     date = DateTimeField()
 
 class HITClusterNegativeRes(Document):
     ID = IntField(primary_key = True, min_value = 1)
-    nlp_phrase = ReferenceField(NLPPhraseCluster)
+    nlp_phrase = ReferenceField(NLPParaphrase)
     user = ReferenceField(User)
-    cluster = ListField(ReferenceField(NLPPhraseCluster))
+    cluster = ListField(ReferenceField(NLPParaphrase))
     date = DateTimeField()
 
 class HITMatchRes(Document):

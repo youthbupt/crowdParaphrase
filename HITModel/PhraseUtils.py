@@ -163,6 +163,15 @@ class PhraseUtils():
                         dbParaDict = {}
                         dbParaDict["dbId"] = dbPara.DatabaseParaphrase.ID
                         dbParaDict["dbParaName"] = dbPara.DatabaseParaphrase.pname
+                        dbParaDict["relationHref"] = "http://dbpedia.org/ontology/" + \
+                            dbPara.DatabaseParaphrase.pname
+                        dbParaDict["subject"] = dbPara.DatabaseParaphrase.subjectExample.replace("_", " ").strip()
+                        dbParaDict["subjectHref"] = "http://dbpedia.org/resource/" + \
+                            dbPara.DatabaseParaphrase.subjectExample
+                        dbParaDict["object"] = dbPara.DatabaseParaphrase.objectExample.replace("_", " ").strip()
+                        dbParaDict["objectHref"] = "http://dbpedia.org/resource/" + \
+                            dbPara.DatabaseParaphrase.objectExample
+                        print dbParaDict
                         dbParaList.append(dbParaDict)
                 nowCluster = []
                 for nlpPara in cluster.cluster:

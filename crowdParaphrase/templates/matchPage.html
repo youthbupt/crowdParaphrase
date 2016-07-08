@@ -36,7 +36,7 @@ body{font-size:84%;}
 <link href="http://libs.baidu.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
 <script src="{% static "js/bootstrap.min.js" %}"></script>
 <script>
-  $(function () { $("[data-toggle='popover']").popover(); });
+  $(function () { $("[data-toggle='popover']").popover({html:true}); });
   function submitMatchResult() {
     waitingDialog.show();
     json_res = JSON.stringify(matchDict)
@@ -156,14 +156,16 @@ body{font-size:84%;}
            <li><a href="labelPage">Start now!</a></li>
            {% endif %}
            
-
         </ul>
      </div>
   </nav>
   {% csrf_token %}
   <div class="dbDragBox">
     {% for dbPara in dbParaList %}
-    <div class="dbDragList" dbId={{ dbPara.dbId }} data-toggle="popover" title="{{ dbPara.dbParaName }}" data-content="Some example is here!">{{ dbPara.dbParaName }}</div>
+    <div class="dbDragList" dbId={{ dbPara.dbId }} data-toggle="popover" title="{{ dbPara.dbParaName }}" 
+    data-content='<a href="{{ dbPara.subjectHref }}" target="view_window">{{ dbPara.subject }}</a><br> <a href="{{ dbPara.relationHref }}" target="view_window">{{ dbPara.dbParaName }}</a> <br><a href="{{ dbPara.objectHref }}" target="view_window">{{ dbPara.object }}</a>'>
+    {{ dbPara.dbParaName }}
+    </div>
     {% endfor %}
   </div>
   <div class="dragbox">

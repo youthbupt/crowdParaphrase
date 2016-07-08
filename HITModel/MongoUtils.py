@@ -20,8 +20,7 @@ class MongoUtils():
     @staticmethod
     def getAndSetDBPhraseWithExample(source, db_phrase, subj, obj):
         if subj is None or obj is None:
-            print "You must offer an example of this phrase, \
-            or you can call getAndSetDBPhrase function"
+            print "You must offer an example of this phrase, or you can call getAndSetDBPhrase function"
             return
         db_objects = dbPhrase.objects(source = source, pname = db_phrase)
         if len(db_objects) > 0:

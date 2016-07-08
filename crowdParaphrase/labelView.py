@@ -99,7 +99,7 @@ def getLabelPage(request):
         randomHIT = PhraseUtils.getRandomHIT(request.session["labledPhrase"])
         # print "123:", randomHIT
         res["phraseList"] = getCluster(randomHIT)
-        print res["phraseList"]
+        # print res["phraseList"]
         return render(request, "labelPage.html", res)
 
 def saveLabeledRes(request):

@@ -9,7 +9,7 @@ class UserUtils():
         if len(user_object) == 0:
             try:
                 user_object = User(ID = User.objects.count() + 1, uname = username, mail = mail, \
-                    password = password, confidence = 0.0, level = 0, taskCount = 0)
+                    password = password, confidence = 0.8, level = 0, taskCount = 0)
             except Exception as e:
                 print e
                 return 0

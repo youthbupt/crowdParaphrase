@@ -46,6 +46,10 @@
       $("#homeWarningBox")[0].innerHTML = '<div class="alert alert-warning"><a class="close" data-dismiss="alert">&times;</a><strong>' + msg + '</strong></div>'
     }
 
+    function showMSGOnHomePage(msg) {
+      $("#homeWarningBox")[0].innerHTML = '<div class="alert alert-success alert-dismissable"><a class="close" data-dismiss="alert">&times;</a><strong>' + msg + '</strong></div>'      
+    }
+
    function login(){
     $.ajax( {
       type: "POST",
@@ -57,7 +61,7 @@
       },
       success: function (data) {
         if (data == "success")
-          location.href = "labelPage/";
+          location.href = "/";
         else {
           showAlertOnLogModal(data)
         }
@@ -90,9 +94,11 @@
         csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value
       },
       success: function (data) {
-        if (data == "success")
-          location.href = "/";
-        else {
+        if (data == "success") {
+          $("#signin-signup-tab").modal("hide")
+          showMSGOnHomePage("You have registered successfully, you can sig in now")
+          //location.href = "/";
+        } else {
           showAlertOnLogModal(data)
         }
       },

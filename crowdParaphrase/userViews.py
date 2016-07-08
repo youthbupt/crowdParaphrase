@@ -36,7 +36,7 @@ def getUserObject(request):
 
 
 def checkLogin(request):
-    # print request.session["user"]
+    print request.session.get("user", None)
     if "user" in request.session:
         return HttpResponse("success")
     else:
@@ -95,7 +95,7 @@ def userRegister(request):
     
     resState = UserUtils.userRegister(username, password, mail)
     if resState == 1:
-        request.session["user"] = username
+        # request.session["user"] = username
         return HttpResponse("success")
 
     if resState == 2:

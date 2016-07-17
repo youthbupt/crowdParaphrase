@@ -100,7 +100,7 @@ def minSimilarDBPhrase():
                 phraseSimi[phrase2][phrase1] = simi
 
         for p in phraseSimi.items():
-            phraseSimi[p[0]] = sorted(p[1].items(), cmp = lambda x, y: cmp(x[1], y[1]))
+            phraseSimi[p[0]] = sorted(p[1].items(), cmp = lambda x, y: cmp(y[1], x[1]))
             print p[0], phraseSimi[p[0]]
             fout.write(p[0] + "\t" + json.dumps(phraseSimi[p[0]]) + "\n")
 

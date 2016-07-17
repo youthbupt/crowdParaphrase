@@ -1,4 +1,6 @@
+#coding = utf8
 import re
+import json
 
 def getTuple(s):
     prefix = "<http://dbpedia.org/resource/"
@@ -64,7 +66,8 @@ def filterQALDPhrase():
             fout.write(line + "\n")
 
 def minSimilarDBPhrase():
-    with open("/media/database/dbpedia2014_sorted_dbo_qald", "r") as fin:
+    with open("/media/database/dbpedia2014_sorted_dbo_qald", "r") as fin, \
+    open("../data/similar_qald_phrase.txt", "w") as fout:
         lines = re.split(r"[\r\n]", fin.read())
         phraseList = {}
         for line in lines:
@@ -97,8 +100,9 @@ def minSimilarDBPhrase():
                 phraseSimi[phrase2][phrase1] = simi
 
         for p in phraseList.items():
-            phraseSimi[p[0]] = sorted(p[1], cmp = lambda x, y: cmp(x[1], y[1]))
+            phraseSimi[p[0]] = sorted(p[1].items(), cmp = lambda x, y: cmp(x[1], y[1]))
             print p[0], phraseSimi[p[0]]
+            fout.write(p[0] + "\t" + json.dumps(phraseSimi[p[0]]) + "\n")
 
 if __name__ == "__main__":
-    filterQALDPhrase()
+    minSimilarDBPhrase()

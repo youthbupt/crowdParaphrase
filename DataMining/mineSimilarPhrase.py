@@ -23,17 +23,21 @@ def jaccardPhraseSimi(list1, list2):
     ptr1 = 0
     ptr2 = 0
     sameCount = 0
+    totalCount = 0
     while (ptr1 < len1 and ptr2 < len2):
         cmpRes = cmpPair(list1[ptr1], list2[ptr2])
         if cmpRes < 0:
             ptr1 += 1
+            totalCount += 1
         elif cmpRes > 0:
             ptr2 += 1
+            totalCount += 1
         else:
             sameCount += 1
+            totalCount += 1
             ptr1 += 1
             ptr2 += 1
-    return (sameCount + 0.0) / max(len1, len2)
+    return (sameCount + 0.0) / totalCount
 
 def filterQALDPhrase():
     QALDPhraseDict = set()

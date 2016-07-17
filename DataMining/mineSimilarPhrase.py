@@ -79,7 +79,7 @@ def minSimilarDBPhrase():
             obj = getTuple(tup[2])
             if relation not in phraseList:
                 phraseList[relation] = []
-            phraseList.append((subj, obj))
+            phraseList[relation].append((subj, obj))
 
         for phrase, entityList in phraseList.items():
             phraseList[phrase] = sorted(entityList, cmpPair)
@@ -99,7 +99,7 @@ def minSimilarDBPhrase():
                 phraseSimi[phrase1][phrase2] = simi
                 phraseSimi[phrase2][phrase1] = simi
 
-        for p in phraseList.items():
+        for p in phraseSimi.items():
             phraseSimi[p[0]] = sorted(p[1].items(), cmp = lambda x, y: cmp(x[1], y[1]))
             print p[0], phraseSimi[p[0]]
             fout.write(p[0] + "\t" + json.dumps(phraseSimi[p[0]]) + "\n")

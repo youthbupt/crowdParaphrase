@@ -26,6 +26,7 @@ class DatabaseParaphrase(Document):
     pname = StringField(max_length = 50)
     subjectExample = StringField(max_length = 50)
     objectExample = StringField(max_length = 50)
+    similarPhrase = ListField(ReferenceField(DatabaseParaphrase))
 
 
 class NLPPhraseCluster(Document):

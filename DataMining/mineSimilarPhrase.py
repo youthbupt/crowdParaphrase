@@ -108,5 +108,16 @@ def minSimilarDBPhrase():
             print p[0], phraseSimi[p[0]]
             fout.write(p[0] + "\t" + json.dumps(phraseSimi[p[0]]) + "\n")
 
+def displaySimilarPhrase(topk = 5):
+    with open("../data/similar_qald_phrase.txt", "r") as fin:
+        lines = re.split(r"[\r\n]", fin.read())
+        for line in lines:
+            if len(line) < 10: continue
+            tup = line.split('\t')
+            if len(tup) != 2: continue
+            simiPair = json.loads(tup[1])
+            simiPair = filter(lambda x: x[1] > 0, simiPair)[:topk]
+            print tup[0], simiPair
+
 if __name__ == "__main__":
-    minSimilarDBPhrase()
+    displaySimilarPhrase()

@@ -1,6 +1,10 @@
 #coding = utf8
 import re
 import json
+import sys
+sys.path.append("../HITModel")
+from PhraseUtils import PhraseUtils
+
 
 def getTuple(s):
     prefix = "<http://dbpedia.org/resource/"
@@ -119,5 +123,49 @@ def displaySimilarPhrase(topk = 5):
             simiPair = filter(lambda x: x[1] > 0, simiPair)[:topk]
             print tup[0], simiPair
 
+def insertPhraseToMongo(topk = 5):
+    with open("../data/similar_qald_phrase.txt", "r") as fin:
+        lines = re.split(r"[\r\n]", fin.read())
+        dbphrase = {}
+        for line in lines:
+            if len(line) < 10: continue
+            tup = line.split('\t')
+            if len(tup) != 2: continue
+            if tup[0] not in dbphrase:
+                tmp_phrase = PhraseUtils.getDBPhraseByName(tup[0])
+                if tmp_phrase == None:
+                    print "%s not exist in database" % simi[0]
+                    continue
+                dbphrase[tup[0]] = tmp_phrase
+            now_phrase = dbphrase[tup[0]]
+            simi_phrase = []
+            simiPair = json.loads(tup[1])
+            simiPair = filter(lambda x: x[1] > 0, simiPair)[:topk]
+            for simi in simiPair:
+                if simi[0] not in dbphrase:
+                    tmp_phrase = PhraseUtils.getDBPhraseByName(simi[0])
+                    if tmp_phrase == None:
+                        print "%s not exist in database" % simi[0]
+                        continue
+                    dbphrase[simi[0]] = tmp_phrase
+
+                simi_phrase.append(dbphrase[simi[0]])
+            
+            #now_phrase.similarPhrase = simi_phrase
+            now_phrase.update(similarPhrase = simi_phrase)
+            print simi_phrase, now_phrase.similarPhrase
+            #now_phrase.update()
+
+            print tup[0], simiPair
+
+def showSimiPhrase():
+    phrase_list = PhraseUtils.getAllDBPhrase()
+    for phrase in phrase_list:
+        print phrase
+        print phrase.similarPhrase
+
 if __name__ == "__main__":
-    displaySimilarPhrase()
+    #displaySimilarPhrase()
+    # showSimiPhrase()
+    # insertPhraseToMongo()
+    showSimiPhrase()

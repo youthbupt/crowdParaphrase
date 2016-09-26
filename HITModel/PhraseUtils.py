@@ -8,13 +8,13 @@ from datetime import datetime
 
 # global parameters
 candPairLen = len(ParaphraseCandidate.objects)
-MAX_NLP_PHRASE = 30
+MAX_NLP_PHRASE = 10
 # print "length of paraphrase candidates list: %d" % candPairLen
 
 class PhraseUtils():
 
     @staticmethod
-    def getRandomHIT(prevList, MAX_DB_PHRASE = 5, MAX_NLP_PHRASE = 30):
+    def getRandomHIT(prevList, MAX_DB_PHRASE = 1, MAX_NLP_PHRASE = 10):
         NLPPhraseCount = 0
         selectedDict = dict()
         cnt = 0
@@ -71,6 +71,17 @@ class PhraseUtils():
     @staticmethod
     def getDBPhrase(phraseId):
         phrase = DatabaseParaphrase.objects(ID = phraseId)
+        if len(phrase) == 0:
+            return None
+        return phrase[0]
+
+    @staticmethod
+    def getAllDBPhrase():
+        return DatabaseParaphrase.objects()
+
+    @staticmethod
+    def getDBPhraseByName(pname):
+        phrase = DatabaseParaphrase.objects(pname = pname)
         if len(phrase) == 0:
             return None
         return phrase[0]
@@ -171,8 +182,23 @@ class PhraseUtils():
                         dbParaDict["object"] = dbPara.DatabaseParaphrase.objectExample.replace("_", " ").strip()
                         dbParaDict["objectHref"] = "http://dbpedia.org/resource/" + \
                             dbPara.DatabaseParaphrase.objectExample
-                        print dbParaDict
+
                         dbParaList.append(dbParaDict)
+                    for simi_dbPara in dbPara.DatabaseParaphrase.similarPhrase:
+                        if simi_dbPara.ID not in dbParaSet:
+                            dbParaSet.add(simi_dbPara.ID)
+                            dbParaDict = {}
+                            dbParaDict["dbId"] = simi_dbPara.ID
+                            dbParaDict["dbParaName"] = simi_dbPara.pname
+                            dbParaDict["relationHref"] = "http://dbpedia.org/ontology/" + \
+                                simi_dbPara.pname
+                            dbParaDict["subject"] = simi_dbPara.subjectExample.replace("_", " ").strip()
+                            dbParaDict["subjectHref"] = "http://dbpedia.org/resource/" + \
+                                simi_dbPara.subjectExample
+                            dbParaDict["object"] = simi_dbPara.objectExample.replace("_", " ").strip()
+                            dbParaDict["objectHref"] = "http://dbpedia.org/resource/" + \
+                                simi_dbPara.objectExample
+                            dbParaList.append(dbParaDict)
                 nowCluster = []
                 for nlpPara in cluster.cluster:
                     if len(nlpParaList) >= EACH_CLUSTER_SHOWN_COUNT:

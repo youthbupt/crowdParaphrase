@@ -14,7 +14,7 @@ CLUSTER_COUNT_EACH_TIME = 1
 stopWordSet = set()
 
 def getStopWords():
-    with open("stopwords.txt") as fin:
+    with open("/media/coding/crowdParaphrase/stopwords.txt") as fin:
         lines = re.split(r"[\r\n]", fin.read())
         for l in lines:
             if len(l) < 1:continue
@@ -88,8 +88,8 @@ def getLabelPage(request):
         
         res["dbParaList"] = dbParaList
         res["nlpCluster"] = nlpCluster
-        # request.session["clusterCount"] = 0
-        # request.session["cluster"] = []
+        request.session["clusterCount"] = 0
+        request.session["cluster"] = []
         return render(request, "matchPage.html", res)
     else:
         
@@ -134,6 +134,7 @@ def saveMatchRes(request):
     user = UserUtils.getUser(request.session["user"])
     if user == None:
         return HttpResponse("No such user!")
+    matchRes = None
     if request.method == "POST":
        matchRes = request.POST.get("matchRes", None)
 

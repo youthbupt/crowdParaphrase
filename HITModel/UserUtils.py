@@ -42,7 +42,5 @@ class UserUtils():
             return None
         return user_object[0]
 
-
-
 if __name__ == "__main__":
     print "user utils!"
